@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+{% if username %}
+<li>用户名:{{ username }}</li>
+<li><a href="{% url 'logout' %}">退出</a></li>
+{% else %}
+<a href="{% url 'login' %}">登录</a>
+<a href="{% url 'register' %}">注册</a>
+{% endif %}
+</body>
+</html>
