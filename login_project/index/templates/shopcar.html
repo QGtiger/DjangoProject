@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    {% if error %}
+        {{ error }}
+    {% else %}
+        {% for product in product_list %}
+            <p>{{ product.product}}  价格: {{ product.price }} <span>从购物车中<a href="{% url 'shoppingcar' %}?product={{ product.product}}">删除</a></span></p>
+
+        {% endfor %}
+    {% endif %}
+    <a href="/">去购物</a>
+</body>
+</html>

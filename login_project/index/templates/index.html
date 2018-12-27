@@ -13,5 +13,21 @@
 <a href="{% url 'login' %}">登录</a>
 <a href="{% url 'register' %}">注册</a>
 {% endif %}
+<a href="{% url 'shoppingcar' %}">购物车</a>
+
+<ol>
+    {% for type in type_list %}
+        <li>
+            <h3>{{ type.type_name }}</h3>
+            <p>
+                {% for name in name_list %}
+                    {% if name.type == type.id %}
+                        <a href="{% url 'index' %}?product={{ name.name }}&price={{ name.price }}">{{ name.name }}</a>
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </li>
+    {% endfor %}
+</ol>
 </body>
 </html>

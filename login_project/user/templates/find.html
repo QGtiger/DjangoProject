@@ -14,17 +14,15 @@
             {% if tips %}
         <div>{{ tips }}</div>
             {% endif %}
-        <form class="form" action="" method="post">
+        <form class="form" action="{% url 'findPassword' %}" method="post">
             {% csrf_token %}
-            <div>用户名:<input type="text" name='username'></div>
-            {% if register %}
-                <div>邮 箱:<input type="email" name='email_input'></div>
-            {% endif %}
-            <div>密 码:<input type="password" name='password'></div>
+            <div>用户名:<input type="text" name='username' value="{{ username }}"></div>
+            <div>验证码:<input type="text" name='VerificationCode'></div>
             {% if new_password %}
-                <div>{{ password_tips }}<input type="password" name='new_password'></div>
+                <div>新密码:<input type="password" name='password'></div>
+                <div>重复密码:<input type="password" name='re_password'></div>
             {% endif %}
-            <button type="submit" class="btn btn-primary btn-block">确定</button>
+            <button type="submit" class="btn btn-primary btn-block">{{ button }}</button>
         </form>
         <div class="flex-left top-gap text-small">
             <div class="unit-2-3">

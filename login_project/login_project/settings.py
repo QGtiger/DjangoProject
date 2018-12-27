@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'index',
-
+    'shopview',
 ]
 
 MIDDLEWARE = [
@@ -132,4 +132,16 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR,'public_static'),]
 
 # 邮箱配置信息
 EMAIL_USER_SSL = True
+
 # 邮箱服务器，如果是163邮箱，就改成smtp.163.com
+EMAIL_HOST = 'smtp.163.com'
+
+# 邮件服务器端口
+EMAIL_POST = 465
+
+# 发送邮件的账号
+EMAIL_HOST_USER = 'qg12148@163.com'
+
+# SMTP服务密码
+EMAIL_HOST_PASSWORD = 'qwer123QG'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
