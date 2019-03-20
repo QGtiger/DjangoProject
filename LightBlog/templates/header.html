@@ -1,0 +1,18 @@
+{% load staticfiles %}
+<div class="container">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'blog:blog_list' %}"><img src="{% static '/images/LFBlog-logo.png' %}" width="100px"></a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav navbar-right" style="margin-right:20px">
+                {% if username %}
+                <li>{{ username }}</li>
+                <li><a href="/account/logout/">LOGOUT</a></li>
+                {% else %}
+                <li><a href="/account/login/">LOGIN</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</div>
