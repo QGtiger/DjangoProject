@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 import random
@@ -10,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 
 # Create your views here.
+@csrf_exempt
 def account_login(request):
     username = request.session.get('username')
     title = ' LFBlog LOGIN '
@@ -26,17 +28,20 @@ def account_login(request):
                 if user.is_active:
                     login(request,user)
                     request.session['username'] = username # 验证是否登录成功，存储到session
-                    return redirect('/blog/')
+                    return HttpResponse("1")
             else:
-                tips = ' 账号错误，请重新输入 '
+                # tips = ' 账号错误，请重新输入 '
+                return HttpResponse("2")
         else:
-            tips = ' 用户名不存在，请注册 '
+            # tips = ' 用户名不存在，请注册 '
+            return HttpResponse("3")
     return render(request, 'account/account_login.html', locals())
 
 def account_logout(request):
     logout(request)
     return redirect('/blog/')
 
+@csrf_exempt
 def account_register(request):
     username = request.session.get('username')
     title = ' LFBlog REGISTER '
@@ -53,20 +58,21 @@ def account_register(request):
         password = request.POST.get('password','')
         re_password = request.POST.get('new_password','')
         if User.objects.filter(username=username):
-            tips = ' 用户已存在 '
+            return HttpResponse("1")
         elif not re.match(r'^[0-9a-zA-Z_]{0,19}@[0-9a-zA-Z]{1,13}\.[com,cn,net]{1,3}$',email):
-            tips = ' 邮箱格式不正确 '
+            return HttpResponse("2")
         elif password != re_password:
-            tips = ' 前后密码不同 '
+            return HttpResponse("3")
         elif password == '' or len(password) < 6:
-            tips = ' 密码能为空，或少于六位 '
+            return HttpResponse("4")
         else:
             user = User.objects.create_user(username=username, password=password, email=email)
             user.save()
             UserInfo.objects.create(user=user)
             login(request, user)
             request.session['username'] = username  # 验证是否登录成功，存储到session
-            return redirect('/blog/')
+            # return redirect('/blog/')
+            return HttpResponse("5")
             # tips = ' 注册成功 '
     return render(request,'account/account_login.html',locals())
 

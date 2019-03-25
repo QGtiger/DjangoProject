@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
@@ -8,20 +8,20 @@
     <div class="flex-center">
     <div class="unit-1-2 unit-1-on-mobile">
         <h1>{{title}}</h1>
-            {% if tips %}
-        <div>{{ tips }}</div>
-            {% endif %}
+            <!--{% if tips %}-->
+        <!--<div>{{ tips }}</div>-->
+            <!--{% endif %}-->
         <form class="form" action="" method="post">
             {% csrf_token %}
-            <div>用户名:<input type="text" name='username'></div>
+            <div>用户名:<input type="text" id="username" ></div>
             {% if register %}
-                <div>邮 箱:<input type="email" name='email_input'></div>
+                <div>邮 箱:<input type="email" id="email" ></div>
             {% endif %}
-            <div>密 码:<input type="password" name='password'></div>
+            <div>密 码:<input type="password" id="password" ></div>
             {% if new_password %}
-                <div>{{ password_tips }}<input type="password" name='new_password'></div>
+                <div>{{ password_tips }}<input type="password" id="new_password" ></div>
             {% endif %}
-            <button type="submit" class="btn btn-primary btn-block">确定</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="post_submit()">确定</button>
         </form>
         <div class="flex-left top-gap text-small">
             <div class="unit-2-3">
@@ -38,4 +38,51 @@
 {% endblock %}
 {% block javascript %}
 <link rel="stylesheet" href="https://unpkg.com/mobi.css/dist/mobi.min.css">
+<script type="text/javascript" src='{% static "js/jquery.js" %}'></script>
+<script type="text/javascript" src="{% static 'js/layer.js'%}"></script>
+<script type="text/javascript">
+function post_submit(){
+    if($('#email').length>0){ //判断是否有email的input标签，来知道是否是登录还是注册
+        var username = $('#username').val();
+        var email = $('#email').val();
+        var password = $('#password').val();
+        var new_password = $('#new_password').val();
+        $.ajax({
+            url: "{% url 'account:account_register' %}",
+            type: "POST",
+            data: {'username':username, 'email_input':email, 'password':password, 'new_password':new_password},
+            success: function(e){
+                if(e=="1"){
+                    layer.msg(" 用户名已存在 ");
+                }else if(e=="2"){
+                    layer.msg(" 邮箱格式不正确 ")
+                }else if(e=="3"){
+                    layer.msg(" 前后密码不同 ")
+                }else if(e=="4"){
+                    layer.msg(" 密码不少于六位 ")
+                }else{
+                    location.href = "{% url 'blog:blog_list' %}";
+                }
+            },
+        });
+    }else{
+        var username = $('#username').val();
+        var password = $('#password').val();
+        $.ajax({
+            url: "{% url 'account:account_login' %}",
+            type: "POST",
+            data: {"username":username,"password":password},
+            success: function(e){
+                if(e=="2"){
+                    layer.msg(" 账号错误，请重新输入 ");
+                }else if(e=="3"){
+                    layer.msg(" 用户名不存在，请注册 ")
+                }else{
+                    location.href = "{% url 'blog:blog_list' %}";
+                }
+            },
+        });
+    }
+}
+</script>
 {% endblock %}
