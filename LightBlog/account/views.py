@@ -9,6 +9,7 @@ import re
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
 from .forms import *
+import json
 
 # Create your views here.
 @csrf_exempt
@@ -28,13 +29,13 @@ def account_login(request):
                 if user.is_active:
                     login(request,user)
                     request.session['username'] = username # 验证是否登录成功，存储到session
-                    return HttpResponse("1")
+                    return HttpResponse(json.dumps({'status':1,'tips':' 登录成功 '}))
             else:
                 # tips = ' 账号错误，请重新输入 '
-                return HttpResponse("2")
+                return HttpResponse(json.dumps({'status':2,'tips':' 密码错误，请重新输入 '}))
         else:
             # tips = ' 用户名不存在，请注册 '
-            return HttpResponse("3")
+            return HttpResponse(json.dumps({'status':3,'tips':' 用户名不存在，请注册 '}))
     return render(request, 'account/account_login.html', locals())
 
 def account_logout(request):
@@ -58,13 +59,13 @@ def account_register(request):
         password = request.POST.get('password','')
         re_password = request.POST.get('new_password','')
         if User.objects.filter(username=username):
-            return HttpResponse("1")
+            return HttpResponse(json.dumps({'status':1,'tips':' 用户名已存在 '}))
         elif not re.match(r'^[0-9a-zA-Z_]{0,19}@[0-9a-zA-Z]{1,13}\.[com,cn,net]{1,3}$',email):
-            return HttpResponse("2")
+            return HttpResponse(json.dumps({'status':2,'tips':' 邮箱格式不正确 '}))
         elif password != re_password:
-            return HttpResponse("3")
+            return HttpResponse(json.dumps({'status':3,'tips':' 前后密码不同 '}))
         elif password == '' or len(password) < 6:
-            return HttpResponse("4")
+            return HttpResponse(json.dumps({'status':4,'tips':' 密码不少于六位 '}))
         else:
             user = User.objects.create_user(username=username, password=password, email=email)
             user.save()
@@ -72,14 +73,16 @@ def account_register(request):
             login(request, user)
             request.session['username'] = username  # 验证是否登录成功，存储到session
             # return redirect('/blog/')
-            return HttpResponse("5")
+            return HttpResponse(json.dumps({'status':5,'tips':' 注册成功,直接登录 '}))
             # tips = ' 注册成功 '
     return render(request,'account/account_login.html',locals())
 
+
+@csrf_exempt
 def account_setpassword(request):
     username = request.session.get('username')
     button = ' 获取验证码 '
-    new_password = False
+    new_password = True
     title = 'LFBlog SETPW'
     unit_2 = '/account/login/'
     unit_2_name = ' 立即登录 '
@@ -87,35 +90,38 @@ def account_setpassword(request):
     unit_1_name = ' 立即注册 '
     if request.method == 'POST':
         username = request.POST.get('username','')
-        VerificationCode = request.POST.get('VerificationCode','')
+        code = request.POST.get('code','')
         password = request.POST.get('password','')
         re_password = request.POST.get('re_password','')
         user = User.objects.filter(username=username)
         if not user:
-            tips =' 用户 '+username+' 不存在 '
+            #tips =' 用户 '+username+' 不存在 '
+            return HttpResponse(json.dumps({'status':1,'tips':' 用户 '+username+' 不存在 '}))
         else:
-            if not request.session.get('VerificationCode',''):
+            if not request.session.get('code',''):
                 button = ' 重置密码 '
                 tips = ' 验证码发送 '
-                new_password = True
-                VerificationCode=str(random.randint(1000,9999))
-                request.session['VerificationCode'] = VerificationCode
-                user[0].email_user(' 找回密码 ', VerificationCode)
-            elif VerificationCode == request.session.get('VerificationCode',''):
+                code = str(random.randint(1000,9999))
+                request.session['code'] = code
+                user[0].email_user(' 找回密码 ', code)
+                return HttpResponse(json.dumps({'status': 5, 'tips': tips,'button':button}))
+            elif code == request.session.get('code',''):
                 if password == re_password:
                     dj_ps = make_password(password,None,'pbkdf2_sha256')
                     user[0].password = dj_ps
                     user[0].save()
-                    del request.session['VerificationCode']
+                    del request.session['code']
                     login(request,user[0])
                     request.session['username']=username
-                    return redirect('/blog/')
+                    #return redirect('/blog/')
+                    return HttpResponse(json.dumps({'status':2,'tips':' 修改成功,直接登录 '}))
                 else:
-                    tips = '前后密码不同 '
+                    #tips = '前后密码不同 '
+                    return HttpResponse(json.dumps({'status': 3, 'tips': ' 前后密码不同 '}))
             else:
                 tips = ' 验证码错误，请重新获取 '
-                new_password = False
-                del request.session['Verification']
+                del request.session['code']
+                return HttpResponse(json.dumps({'status':4,'tips':' 验证码错误，请重新获取 '}))
     return render(request,'account/account_setpassword.html',locals())
 
 

@@ -52,14 +52,9 @@ function post_submit(){
             type: "POST",
             data: {'username':username, 'email_input':email, 'password':password, 'new_password':new_password},
             success: function(e){
-                if(e=="1"){
-                    layer.msg(" 用户名已存在 ");
-                }else if(e=="2"){
-                    layer.msg(" 邮箱格式不正确 ")
-                }else if(e=="3"){
-                    layer.msg(" 前后密码不同 ")
-                }else if(e=="4"){
-                    layer.msg(" 密码不少于六位 ")
+                res = JSON.parse(e);
+                if(res.status!="5"){
+                    layer.msg(res.tips);
                 }else{
                     location.href = "{% url 'blog:blog_list' %}";
                 }
@@ -73,10 +68,9 @@ function post_submit(){
             type: "POST",
             data: {"username":username,"password":password},
             success: function(e){
-                if(e=="2"){
-                    layer.msg(" 账号错误，请重新输入 ");
-                }else if(e=="3"){
-                    layer.msg(" 用户名不存在，请注册 ")
+                res = JSON.parse(e);
+                if(res.status != 1){
+                    layer.msg(res.tips);
                 }else{
                     location.href = "{% url 'blog:blog_list' %}";
                 }
