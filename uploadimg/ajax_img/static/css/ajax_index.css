@@ -1,0 +1,24 @@
+body{
+    margin: 50px!important;
+}
+
+.file-box{
+    position: relation;
+    width: 200px;
+    height: 200px;
+    background: url('../images/uploadPic.jpg')no-repeat;
+    background-size: 200px 200px;
+}
+
+#input_file{
+	width: 100%;
+	height:100%;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+
+.img_submit{
+    margin-left: 60px;
+    margin-top:20px;
+}

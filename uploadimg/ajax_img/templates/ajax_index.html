@@ -1,0 +1,45 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax上传图片</title>
+    <link rel="stylesheet" href="{% static 'css/ajax_index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/layer.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ajax_index.js' %}"></script>
+</head>
+<body>
+    <div class="file-box">
+        <input type="file" name="file" id="input_file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" onchange="imgPreview(this, 0)">
+    </div>
+    <button type="button" class="btn btn-primary img_submit" onclick="post_img()">上传</button>
+
+</body>
+
+<script type="text/javascript">
+function post_img(){
+    var file = document.getElementById('input_file').files[0];
+    var formData = new FormData();
+    formData.append('file', $('#input_file')[0].files[0]);
+    formData.append('filename', file.name);
+    $.ajax({
+        url: "{% url 'ajax_img:index_view' %}",
+        type: "post",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(e){
+            info = JSON.parse(e);
+            console.log(info.status)
+            if(info.status=='200'){
+                layer.msg(info.tips);
+            }else{
+                layer.msg(info.tips)
+            }
+        }
+    });
+}
+</script>
+</html>
