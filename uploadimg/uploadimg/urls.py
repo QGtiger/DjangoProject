@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('user.urls')),
     path('ajax_img/', include('ajax_img.urls')),
+    path('cropper_img/',include('cropper_img.urls')),
 ]

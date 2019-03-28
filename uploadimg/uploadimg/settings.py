@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'ajax_img',
+    'cropper_img',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR,'user/templates'),
             os.path.join(BASE_DIR,'ajax_img/templates'),
+            os.path.join(BASE_DIR,'cropper_img/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
