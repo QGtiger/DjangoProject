@@ -82,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'login_test',
         'USER': 'root',
-        'PASSWORD':'',
+        'PASSWORD':'111111',
         'HOST':'127.0.0.1',
         'PORT':'3306'
     }
@@ -132,6 +132,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR,'public_static'),]
 
 # 邮箱配置信息
 EMAIL_USER_SSL = True
+#EMAIL_USE_TLS = True   #是否使用TLS安全传输协议
 
 # 邮箱服务器，如果是163邮箱，就改成smtp.163.com
 EMAIL_HOST = 'smtp.163.com'

@@ -5,6 +5,8 @@ from django.contrib.auth import login,logout,authenticate
 import random
 from django.contrib.auth.hashers import make_password
 import re
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 def loginView(request):
@@ -122,7 +124,9 @@ def findPassword(request):
                 new_password = True
                 VerificationCode = str(random.randint(1000,9999))
                 request.session['VerificationCode'] = VerificationCode
-                user[0].email_user(' 找回密码 ', VerificationCode)
+                # user[0].email_user(' 找回密码 ', VerificationCode)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                send_mail('MyDjango','This is from django'+VerificationCode,from_email,['1426286337@qq.com'])
             elif VerificationCode == request.session.get('VerificationCode',''):
                 if password == re_password:
                     dj_ps = make_password(password, None, 'pbkdf2_sha256')
