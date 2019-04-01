@@ -3,14 +3,25 @@
 {% block title %}articles list{% endblock %}
 {% block content %}
 <div>
-    <table class="table table-hover">
-        <tr>
+    <div class="columns-table">
+  <table class="layui-table"  lay-even="" lay-skin="nob">
+    <colgroup>
+      <col class="layui-col-xs1">
+      <col class="layui-col-xs4">
+      <col class="layui-col-xs4">
+      <col class="layui-col-xs3">
+    </colgroup>
+    <thead>
+      <tr>
             <td>序号</td>
             <td>标题</td>
             <td>栏目</td>
             <td>操作</td>
         </tr>
-        {% for article in articles %}
+    </thead>
+    <tbody>
+      {% for article in articles %}
+        <tr>
             <td>{{ forloop.counter }}</td>
             <td><a href="{% url 'article:article_detail' article.id %}">{{ article.title }}</a></td>
             <td>{{ article.column }}</td>
@@ -20,7 +31,9 @@
             </td>
         </tr>
         {% endfor %}
-    </table>
+    </tbody>
+  </table>
+</div>
     {% include "paginator.html" %}
 </div>
 
@@ -56,7 +69,3 @@
 </script>
 {% endblock %}
 
-{% block javascript %}
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-{% endblock %}

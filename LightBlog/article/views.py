@@ -122,10 +122,10 @@ def redit_article(request, article_id):
     if request.method == "GET":
         article_columns = user.article_column.all()
         article = ArticlePost.objects.get(id=article_id)
-        this_article_form = ArticlePostForm(initial={"title": article.title})
+        # this_article_form = ArticlePostForm(initial={"title": article.title})
         this_article_column = article.column
         return render(request, "article/redit_article.html",
-                      {"article": article, "article_columns": article_columns, "this_article_column": this_article_column, "this_article_form": this_article_form})
+                      {"article": article, "article_columns": article_columns, "this_article_column": this_article_column})
     else:
         redit_article = ArticlePost.objects.get(id=article_id)
         try:
