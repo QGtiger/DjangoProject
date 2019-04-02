@@ -46,23 +46,15 @@
 
         </div>
 
-        <div class="layui-col-xs12 layui-col-md4">
-            <div style="margin-right:100px">
+        <div class="layui-col-xs12 layui-col-md4" style="padding-left:100px">
+            <div style="width:200px">
                 {% if userinfo.photo %}
-                <img src="{{ userinfo.photo | striptags }}" class="layui-circle" id="my_photo" name="user_face">
+                <img src="/static/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="my_photo" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
                 {% else %}
-                <img name="user_face" src="{% static 'images/avatar.jpg' %}" class="layui-circle" width="270px" id="my_photo">
+                <img name="user_face" src="{% static 'images/avatar.jpg' %}" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="my_photo">
                 {% endif %}
-            </div>
-            <div style="margin-right:100px;display:flex;justify-content:center">
-                <button class="layui-btn layui-btn-normal layui-btn-radius" id="upload_image" onclick="upload_image_layer()">upload my photo</button>
             </div>
         </div>
     </div>
 
-{% endblock %}
-
-{% block javascript %}
-<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 {% endblock %}

@@ -1,8 +1,9 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
+from django.conf import settings
 import random
 from django.contrib.auth.hashers import make_password
 import re
@@ -135,39 +136,44 @@ def myself(request):
 
 
 @login_required(login_url='/account/login/')
+@csrf_exempt
 def myself_edit(request):
     username = request.session.get('username','')
     user = User.objects.get(username=username)
     userinfo = UserInfo.objects.get(user=user)
     if request.method == 'POST':
-        user_form = UserForm(request.POST)
-        userinfo_form = UserInfoForm(request.POST)
-        if user_form.is_valid() and userinfo_form.is_valid():
-            user_cd = user_form.cleaned_data
-            userinfo_cd = userinfo_form.cleaned_data
-            user.email = user_cd['email']
-            userinfo.school = userinfo_cd['school']
-            userinfo.company = userinfo_cd['company']
-            userinfo.profession = userinfo_cd['profession']
-            userinfo.address = userinfo_cd['address']
-            userinfo.aboutme = userinfo_cd['aboutme']
+        try:
+            user.email = request.POST.get('email','')
+            userinfo.school = request.POST.get('school','')
+            userinfo.company = request.POST.get('company','')
+            userinfo.profession = request.POST.get('profession','')
+            userinfo.address = request.POST.get('address','')
+            userinfo.aboutme = request.POST.get('aboutme','')
             user.save()
             userinfo.save()
-        return redirect('/account/myinformation/')
+            return HttpResponse(json.dumps({'status':200,'tips':'修改成功'}))
+        except:
+            return HttpResponse(json.dumps({'status':500,'tips':'修改失败'}))
     else:
-        user_form = UserForm(instance=user)
-        userinfo_form = UserInfoForm(initial={"school": userinfo.school, "company": userinfo.company, "profession": userinfo.profession, "address": userinfo.address, "aboutme": userinfo.aboutme})
         return render(request,"account/edit_myself.html",locals())
 
 @login_required(login_url='/account/login/')
+@csrf_exempt
 def my_image(request):
     username = request.session.get('username','')
     if request.method == 'POST':
-        img = request.POST['img']
+        uploadimg = request.FILES.get('uploadimg', '')
         user = User.objects.get(username=username)
         userinfo = UserInfo.objects.get(user=user)
-        userinfo.photo = img
+        userinfo.photo = username+'.jpg'
         userinfo.save()
-        return redirect('/account/myinformation/')
+        fname = '{}/avator/{}.jpg'.format(settings.MEDIA_ROOT, username)
+        try:
+            with open(fname,'wb') as f:
+                for c in uploadimg.chunks():
+                    f.write(c)
+            return HttpResponse(json.dumps({'status':200,'tips':'上传成功'}))
+        except:
+            return HttpResponse(json.dumps({'status':500,'tips':'上传失败'}))
     else:
-        return render(request,'account/imagecrop.html')
+        return HttpResponse("该页面摸得GET")

@@ -15,7 +15,7 @@ def article_column(request):
     user = User.objects.get(username=username)
     if request.method=='GET':
         columns = ArticleColumn.objects.filter(user=user)
-        column_form = ArticleColumnForm()
+        # column_form = ArticleColumnForm()
         return render(request,'article/article_column.html',locals())
     if request.method=='POST':
         column_name = request.POST['column']

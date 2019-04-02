@@ -53,7 +53,7 @@
             skin: "layui-layer-rim",
             area: ["400px", "200px"],
             title: "新增栏目",
-            content: '<div class="text-center" style="margin-top:20px"><p> 请输入新的栏目名称</p><p>{{ column_form.column }}</p></div>',
+            content: '<div class="layui-form-item" style="margin:45px 40px 0 0;"><label class="layui-form-label">请输入栏目</label><div class="layui-input-block"><input type="text" name="article_column" id="id_column" lay-verify="article_column" autocomplete="off" placeholder="请输入栏目名" class="layui-input"></div></div>',
             btn: ['确定', '取消'],
             yes: function (index, layero) {
                 column_name = $('#id_column').val();
@@ -84,7 +84,7 @@
             skin: "layui-layer-rim",
             area: ["400px", "200px"],
             title: "编辑栏目",
-            content: '<div class="text-center" style="margin-top:20px"> <p>请编辑的栏目名称</p><p><input type="text" id="new_name" value="'+name+'"></p> </div>',
+            content: '<div class="layui-form-item" style="margin:45px 40px 0 0;"><label class="layui-form-label">请输入栏目</label><div class="layui-input-block"><input type="text" name="new_name" id="new_name" lay-verify="new_name" autocomplete="off" placeholder="请输入新的栏目名" class="layui-input" value="'+name+'"></div></div>',
             btn:['确定', '取消'],
             yes: function(index, layero){
                 new_name = $("#new_name").val();
@@ -112,7 +112,7 @@
             skin: "layui-layer-rim",
             area: ["400px", "200px"],
             title: "删除栏目",
-            content: '<div class="text-center" style="margin-top:20px"><p>是否确定删除 '+name+' 栏目</p> </div>',
+            content: '<div style="margin:45px 0 0 30px;font-weight:400;font-size:16px"><p>是否确定删除 '+name+' 栏目</p> </div>',
             btn:['确定', '取消'], yes: function(){
                 $.ajax({
                     url: '{% url "article:del_article_column" %}',
