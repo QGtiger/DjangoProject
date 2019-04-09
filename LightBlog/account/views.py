@@ -7,6 +7,7 @@ from django.conf import settings
 import random
 from django.contrib.auth.hashers import make_password
 import re
+from django.views.decorators.http import require_POST
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
 from .forms import *
@@ -177,3 +178,18 @@ def my_image(request):
             return HttpResponse(json.dumps({'status':500,'tips':'上传失败'}))
     else:
         return HttpResponse("该页面摸得GET")
+
+@login_required(login_url='/account/login/')
+@csrf_exempt
+@require_POST
+def get_avator(request):
+    try:
+        user = User.objects.get(username=request.POST.get('username'))
+        userinfo = UserInfo.objects.get(user=user)
+        print(userinfo.photo)
+        if userinfo.photo:
+            return HttpResponse(json.dumps({'static':200,'photo':'/static/avator/{}'.format(userinfo.photo)}))
+        else:
+            return HttpResponse(json.dumps({'static':201,'photo':'/static/avator/1554199336240.jpg'}))
+    except:
+        return HttpResponse(json.dumps({'static':500,'tips':'Something error'}))

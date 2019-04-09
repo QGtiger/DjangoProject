@@ -108,7 +108,7 @@ function register_login(){
                 if(res.status != 1){
                     layer.msg(res.tips);
                 }else{
-                    location.href = "{% url 'blog:blog_list' %}";
+                    location.href = "{% url 'article:article_titles' %}";
                 }
             },
         });

@@ -3,8 +3,8 @@
 {% block title %}articles list{% endblock %}
 {% block content %}
 
-<div class="container">
-    <div class="col-md-9">
+<div class="container" style="margin:20px 60px 0 60px">
+    <div>
         <header>
             <h1>{{ article.title }}</h1>
             <p>{{ article.author.username }}</p>
@@ -16,6 +16,19 @@
 {{ article.body }}
         </textarea>
         </div>
+    </div>
+    <div style="text-align:center">
+        <a href="#" onclick="is_like({{ article.id }},'like')"><span><i class="layui-icon layui-icon-praise"></i>like</span></a>
+        <span style="display:inline-block;width:50px"></span>
+        <a href="#" onclick="is_like({{ article.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i>unlike</span></a>
+    </div>
+    <div style="text-align:center">
+        <p><strong>点赞本文的读者</strong></p>
+        {% for user in article.users_like.all %}
+        <p>{{ user.username }}</p>
+        {% empty %}
+        <p>还没有人对此文表态</p>
+        {% endfor %}
     </div>
 </div>
 
@@ -39,5 +52,18 @@ $(function(){
         sequenceDiagram : true,
     });
 });
+
+function is_like(id, action){
+    $.ajax({
+        url: "{% url 'article:like_article' %}",
+        data: {'id': id,'action':action},
+        type: 'POST',
+        dataType: 'json',
+        success: function(e){
+            layer.msg(e.tips);
+            window.location.reload();
+        }
+    })
+}
 </script>
 {% endblock %}

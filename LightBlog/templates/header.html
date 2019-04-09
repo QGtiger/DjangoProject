@@ -1,13 +1,13 @@
 {% load staticfiles %}
-<ul class="layui-nav">
+<ul class="layui-nav" >
   <li class="layui-nav-item">
-    <a href="{% url 'blog:blog_list' %}">博客首页<span class="layui-badge">9</span></a>
+    <a href="{% url 'article:article_titles' %}">博客首页<span class="layui-badge">9</span></a>
   </li>
   <li class="layui-nav-item">
     <a href="{% url 'account:my_information' %}">个人中心<span class="layui-badge-dot"></span></a>
   </li>
   <li class="layui-nav-item" lay-unselect="" style="float:right">
-    <a href="javascript:;"><img src="http://qnpic.top/yoona%5C%E7%85%A7%E7%89%87%202019-3-8%20%E4%B8%8A%E5%8D%8810%2001%2024.jpg" class="layui-nav-img">{{ username }}</a>
+    <a class="username" href="javascript:;"><img id="avator" src="http://qnpic.top/yoona%5C%E7%85%A7%E7%89%87%202019-3-8%20%E4%B8%8A%E5%8D%8810%2001%2024.jpg" class="layui-nav-img">{{ request.user.username }}</a>
     <dl class="layui-nav-child">
       <dd><a href="{% url 'account:my_information' %}">个人信息</a></dd>
       <dd><a href="{% url 'account:edit_myself' %}">完善信息</a></dd>
@@ -28,6 +28,24 @@
     	layer.msg(elem.text());
   		});
 	});
+
+	$(function(){
+	    username = $('.username').text();
+	    $.ajax({
+	        url: "{% url 'account:get_avator' %}",
+	        type: 'POST',
+	        data: {'username':username},
+	        success: function(e){
+	            res = JSON.parse(e);
+	            console.log(res);
+                if(res.static!=500){
+                    $('#avator').attr('src',res.photo);
+                }else{
+                    layer.msg(res.tips);
+                }
+	        }
+	    })
+	})
 </script>
 
 <!--<div class="container">-->

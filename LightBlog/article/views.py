@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .models import ArticleColumn,ArticlePost
 from .forms import ArticleColumnForm,ArticlePostForm
 from django.core.paginator import PageNotAnInteger,Paginator,EmptyPage
+import json
 
 # Create your views here.
 @login_required(login_url='/account/login/')
@@ -136,3 +137,22 @@ def redit_article(request, article_id):
             return HttpResponse("1")
         except:
             return HttpResponse("2")
+
+@login_required(login_url='/account/login')
+@require_POST
+@csrf_exempt
+def like_article(request):
+    user = User.objects.get(username=request.session.get('username',''))
+    article_id = request.POST.get('id','')
+    action = request.POST.get('action')
+    if article_id and action:
+        try:
+            article = ArticlePost.objects.get(id=article_id)
+            if action=='like':
+                article.users_like.add(user)
+                return HttpResponse(json.dumps({'static':200,'tips':'感谢您的喜爱'}))
+            else:
+                article.users_like.remove(user)
+                return HttpResponse(json.dumps({'static':201,'tips':'我会努力的'}))
+        except:
+            return HttpResponse(json.dumps({'static':500,'tips':'系统错误,重新尝试'}))

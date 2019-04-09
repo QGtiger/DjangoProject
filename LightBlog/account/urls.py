@@ -11,4 +11,5 @@ urlpatterns = [
     path(r'myinformation/',views.myself,name='my_information'),
     path(r'edit_myself/',views.myself_edit,name='edit_myself'),
     path(r'my-image/', views.my_image, name="my_image"),
+    path(r'get_avator/',views.get_avator, name='get_avator')
 ]

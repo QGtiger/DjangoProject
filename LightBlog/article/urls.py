@@ -14,5 +14,7 @@ urlpatterns = [
     path('del-article/', views.del_article, name="del_article"),
     path('redit-article/<int:article_id>/', views.redit_article, name="redit_article"),
     path('list_article_titles/',list_views.article_titles,name="article_titles"),
-    path('article_content/<int:article_id>/',list_views.article_content,name="article_content")
+    path('article_content/<int:article_id>/',list_views.article_content,name="article_content"),
+    path('like_article/',views.like_article,name="like_article"),
+    path('article_page/',list_views.article_page, name="article_page")
 ]

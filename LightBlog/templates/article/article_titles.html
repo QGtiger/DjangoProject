@@ -1,19 +1,63 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block title %} articles {% endblock %}
 {% block content %}
-<div class="row text-center vertical-middle-sm">
-    <h1>阅读，丰富头脑，善化行为</h1>
-</div>
+
 <div class="container">
-    {% for article in articles %}
-    <div class="list-group">
-        <a href="{% url 'article:article_content' article.id %}" class="list-group-item active">
-            <h4 class="list-group-item-heading">{{article.title}}</h4>
-        </a>
-        <p class="list-group-item-text">作者:{{article.author.username}}</p>
-        <p class="list-group-item-text">概要:{{article.body|slice:'70'| linebreaks}}</p>
-    </div>
-    {% endfor %}
-    {% include "paginator.html" %}
+    <h1>阅读，丰富头脑，善化行为</h1>
+    <!--{% for article in articles %}-->
+    <!--<div class="list-group">-->
+        <!--<a href="{% url 'article:article_content' article.id %}" class="list-group-item active">-->
+            <!--<h3 class="list-group-item-heading">{{article.title}}</h3>-->
+        <!--</a>-->
+        <!--<p class="list-group-item-text">作者:{{article.author.username}}</p>-->
+        <!--<p class="list-group-item-text">概要:{{article.body|slice:'70'| linebreaks}}</p>-->
+    <!--</div>-->
+    <!--{% endfor %}-->
+    <!--{% include "paginator.html" %}-->
+    <ul id="flow_demo" ></ul>
+
+<script type="text/javascript">
+	layui.use(['laypage','layer','flow'],function(){
+		var laypage = layui.laypage;
+		var layer = layui.layer;
+		var flow = layui.flow;
+
+		flow.load({
+			elem: "#flow_demo",
+			is_Auto:true,
+			end: "emm,nothing next",
+			is_Lazyimg: true,
+			done: function(page,next){
+				var lis = '';
+				$.get('/article/article_page/?page='+page, function(e){
+				    parse_res = JSON.parse(e)
+                    res = parse_res.data
+                    page_num = parse_res.page_num
+                    console.log(res)
+				    for(var i = 0; i < res.length; i++){
+
+                        var item = '<div class="list-group">'+
+                            '<a href="/article/article_content/'+res[i].id+'" class="list-group-item active">'+
+                                '<h3 class="list-group-item-heading">'+res[i].title+'</h3>'+
+                            '</a>'+
+                            '<p class="list-group-item-text">作者:'+res[i].author+'</p>'+
+                            '<p class="list-group-item-text">概要:'+res[i].body+'</p>'+
+                            '<p class="meta"><span><i class="layui-icon layui-icon-praise"></i> '+res[i].users_like+'</span>'+
+                            '<span class="update_time">'+res[i].updated+'</span>'+
+                            '</p>'+
+                        '</div>';
+
+                        lis+=item;
+
+				    }
+				    next(lis,page<page_num)
+				})
+
+
+			}
+		})
+	})
+</script>
 </div>
 {% endblock %}
