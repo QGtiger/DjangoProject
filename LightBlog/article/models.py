@@ -34,3 +34,17 @@ class ArticlePost(models.Model):
     def save(self, *args, **kargs):
         self.slug = slugify(self.title)
         super(ArticlePost, self).save(*args, **kargs)
+
+
+class Comment(models.Model):
+    article = models.ForeignKey(ArticlePost, on_delete=models.CASCADE, related_name="comments")
+    commentator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="commentator")
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    comment_like = models.ManyToManyField(User, related_name="comment_like", blank=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __str__(self):
+        return "Comment by {} on {}".format(self.commentator,self.created)

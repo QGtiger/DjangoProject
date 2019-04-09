@@ -8,6 +8,7 @@ from .forms import ArticleColumnForm,ArticlePostForm
 from django.core.paginator import PageNotAnInteger,Paginator,EmptyPage
 import json
 
+
 # Create your views here.
 @login_required(login_url='/account/login/')
 @csrf_exempt
@@ -26,6 +27,7 @@ def article_column(request):
         else:
             ArticleColumn.objects.create(user=user,column=column_name)
             return HttpResponse('1')
+
 
 @login_required(login_url='/account/login')
 @require_POST
@@ -84,7 +86,7 @@ def article_post(request):
 def article_list(request):
     user = User.objects.get(username=request.session.get('username',''))
     articles_list = ArticlePost.objects.filter(author=user)
-    paginator = Paginator(articles_list, 2)
+    paginator = Paginator(articles_list, 6)
     page = request.GET.get('page')
     try:
         current_page = paginator.page(page)
@@ -142,13 +144,13 @@ def redit_article(request, article_id):
 @require_POST
 @csrf_exempt
 def like_article(request):
-    user = User.objects.get(username=request.session.get('username',''))
+    user = request.user
     article_id = request.POST.get('id','')
     action = request.POST.get('action')
     if article_id and action:
         try:
             article = ArticlePost.objects.get(id=article_id)
-            if action=='like':
+            if action == 'like':
                 article.users_like.add(user)
                 return HttpResponse(json.dumps({'static':200,'tips':'感谢您的喜爱'}))
             else:

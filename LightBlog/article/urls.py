@@ -16,5 +16,6 @@ urlpatterns = [
     path('list_article_titles/',list_views.article_titles,name="article_titles"),
     path('article_content/<int:article_id>/',list_views.article_content,name="article_content"),
     path('like_article/',views.like_article,name="like_article"),
-    path('article_page/',list_views.article_page, name="article_page")
+    path('article_page/',list_views.article_page, name="article_page"),
+    path('comment_like/',list_views.comment_like, name='comment_like')
 ]

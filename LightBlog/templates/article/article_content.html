@@ -3,11 +3,11 @@
 {% block title %}articles list{% endblock %}
 {% block content %}
 
-<div class="container" style="margin:20px 60px 0 60px">
+<div class="container" style="margin:20px 100px 0 100px">
     <div>
         <header>
-            <h1>{{ article.title }}</h1>
-            <p>{{ article.author.username }}</p>
+            <h1 style="margin:20px 0">{{ article.title }}</h1>
+            <p style="padding-left:10px"><a href="{% url 'account:author_info' article.author.username %}">{{ article.author.username }}</a></p>
         </header>
 
         <link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}"/>
@@ -25,10 +25,52 @@
     <div style="text-align:center">
         <p><strong>点赞本文的读者</strong></p>
         {% for user in article.users_like.all %}
-        <p>{{ user.username }}</p>
+        <p><a href="{% url 'account:author_info' user.username %}">{{ user.username }}</a></p>
         {% empty %}
         <p>还没有人对此文表态</p>
         {% endfor %}
+    </div>
+    <div class="comment">
+        <form action="" method="POST">{% csrf_token %}
+        <div class="layui-form-label " style="height:80px">
+            {% if request.session.username %}
+            <img src="/static/avator/{{ request.session.username }}.jpg" class="layui-nav-img">
+            {% else %}
+            <img src="/static/avator/1554199539806.jpg" class="layui-nav-img">
+            {% endif %}
+        </div>
+    <div class="layui-input-block">
+      <textarea placeholder="请输入内容" class="layui-textarea comment_text"></textarea>
+    </div>
+            <input type="button" class="layui-btn layui-btn-normal comment-btn" value="发送">
+        </form>
+    </div>
+    <div class="history-comment">
+        <ul>
+            {% for comment in comments %}
+            <li>
+                <div class="commentator">
+                    <div class="commentator-img">
+                        <a href="/account/author/{{ comment.commentator.username }}">
+                            <img src="/static/avator/{{ comment.commentator.username }}.jpg" class="layui-nav-img" alt="">
+                        </a>
+                    </div>
+                    <div class="commentator-info">
+                        <a href="/account/author/{{ comment.commentator.username }}">{{ comment.commentator.username }}</a>
+                        <span>{{ comment.created | date:"Y-m-d H:i:s" }}</span>
+                    </div>
+                    <div class="comment-wrap">
+                        <p>{{ comment.body }}</p>
+                    </div>
+                    <div class="meta">
+                        <a href="" onclick="comment_like({{ comment.id }},'like')" data-anim="layui-anim-scaleSpring"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>
+                        <a href="#" onclick="comment_like({{ comment.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>
+                    </div>
+                </div>
+
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 
@@ -51,6 +93,7 @@ $(function(){
         flowChart:true,
         sequenceDiagram : true,
     });
+
 });
 
 function is_like(id, action){
@@ -60,10 +103,52 @@ function is_like(id, action){
         type: 'POST',
         dataType: 'json',
         success: function(e){
-            layer.msg(e.tips);
-            window.location.reload();
+            if(e.static!='500'){
+                layer.confirm(e.tips,{
+                        btn: ['确定']
+                    },function(){
+                        window.location.reload();
+                    });
+            }
         }
     })
 }
+
+function comment_like(id, action){
+    $.ajax({
+        url: "{% url 'article:comment_like' %}",
+        type: "POST",
+        data: {"id": id, "action": action},
+        success: function(e){
+            res = JOSN.parse(e);
+            if(res.static==200){
+
+            }
+        }
+    })
+}
+
+$('.comment-btn').on('click',function(){
+    if($('.username').text()==''){
+        layer.msg('请先登录')
+    }else{
+        var comment = $('.comment_text').val();
+        $.ajax({
+            url: '{% url "article:article_content" article.id %}',
+            type: "POST",
+            data: {'comment':comment },
+            success: function(e){
+                res = JSON.parse(e);
+                if(res.static='200'){
+                    layer.confirm(res.tips,{
+                        btn: ['嗯']
+                    },function(){
+                        window.location.reload();
+                    });
+                }
+            }
+        })
+    }
+})
 </script>
 {% endblock %}

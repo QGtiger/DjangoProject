@@ -193,3 +193,10 @@ def get_avator(request):
             return HttpResponse(json.dumps({'static':201,'photo':'/static/avator/1554199336240.jpg'}))
     except:
         return HttpResponse(json.dumps({'static':500,'tips':'Something error'}))
+
+
+def author_info(request, username):
+    title = "{} 个人信息".format(username)
+    user = User.objects.get(username=username)
+    userinfo = UserInfo.objects.get(user=user)
+    return render(request, 'account/myself.html', locals())
