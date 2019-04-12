@@ -62,9 +62,9 @@
         <div class="layui-col-xs12 layui-col-md6" style="padding-left:100px">
             <div style="width:200px">
                 {% if userinfo.photo %}
-                <img src="/media/avator/{{ userinfo.photo | striptags }}?1433223" class="layui-circle" id="finalImg" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
+                <img src="/media/avator/{{ userinfo.photo | striptags }}?1433223" class="layui-circle" id="finalImg avator" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
                 {% else %}
-                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="finalImg">
+                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="finalImg avator">
                 {% endif %}
             </div>
             <div style="width:200px;display:flex;justify-content:center">
