@@ -34,9 +34,9 @@
         <form action="" method="POST">{% csrf_token %}
         <div class="layui-form-label " style="height:80px">
             {% if request.session.username %}
-            <img src="/static/avator/{{ request.session.username }}.jpg" class="layui-nav-img">
+            <img src="/media/avator/{{ request.session.username }}.jpg" class="layui-nav-img">
             {% else %}
-            <img src="/static/avator/1554199539806.jpg" class="layui-nav-img">
+            <img src="/media/avator/1554199539806.jpg" class="layui-nav-img">
             {% endif %}
         </div>
     <div class="layui-input-block">
@@ -52,7 +52,7 @@
                 <div class="commentator">
                     <div class="commentator-img">
                         <a href="/account/author/{{ comment.commentator.username }}">
-                            <img src="/static/avator/{{ comment.commentator.username }}.jpg" class="layui-nav-img" alt="">
+                            <img src="/media/avator/{{ comment.commentator.username }}.jpg" class="layui-nav-img" alt="">
                         </a>
                     </div>
                     <div class="commentator-info">

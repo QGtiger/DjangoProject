@@ -49,9 +49,9 @@
         <div class="layui-col-xs12 layui-col-md4" style="padding-left:100px">
             <div style="width:200px">
                 {% if userinfo.photo %}
-                <img src="/static/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="my_photo" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
+                <img src="/media/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="my_photo" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
                 {% else %}
-                <img name="user_face" src="{% static 'images/avatar.jpg' %}" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="my_photo">
+                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="my_photo">
                 {% endif %}
             </div>
         </div>

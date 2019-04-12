@@ -19,6 +19,7 @@
 </ul>
 
 <script>
+
     layui.use('element', function(){
   		var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
 
@@ -39,13 +40,15 @@
 	            res = JSON.parse(e);
 	            console.log(res);
                 if(res.static!=500){
-                    $('#avator').attr('src',res.photo);
+                    $('#avator').attr('src',res.photo+'?'+Math.random());
                 }else{
                     layer.msg(res.tips);
                 }
 	        }
 	    })
 	})
+
+
 </script>
 
 <!--<div class="container">-->

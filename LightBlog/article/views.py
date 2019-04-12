@@ -13,13 +13,12 @@ import json
 @login_required(login_url='/account/login/')
 @csrf_exempt
 def article_column(request):
-    username = request.session.get('username','')
-    user = User.objects.get(username=username)
-    if request.method=='GET':
+    user = request.user
+    if request.method == 'GET':
         columns = ArticleColumn.objects.filter(user=user)
         # column_form = ArticleColumnForm()
         return render(request,'article/article_column.html',locals())
-    if request.method=='POST':
+    if request.method == 'POST':
         column_name = request.POST['column']
         columns = ArticleColumn.objects.filter(user=user,column=column_name)
         if columns:
@@ -60,9 +59,8 @@ def del_article_column(request):
 @login_required(login_url='/account/login/')
 @csrf_exempt
 def article_post(request):
-    username = request.session.get('username','')
-    user = User.objects.get(username=username)
-    if request.method=='POST':
+    user = request.user
+    if request.method == 'POST':
         article_post_form = ArticlePostForm(data=request.POST)
         if article_post_form.is_valid():
             cd = article_post_form.cleaned_data
@@ -103,6 +101,9 @@ def article_list(request):
 @login_required(login_url='/account/login/')
 def article_detail(request, id):
     article = get_object_or_404(ArticlePost, id=id)
+    user = request.user
+    if user.username != article.author.username:
+        return HttpResponse('You do not have permission!')
     return render(request, "article/article_detail.html", locals())
 
 
@@ -111,6 +112,10 @@ def article_detail(request, id):
 @csrf_exempt
 def del_article(request):
     article_id = request.POST['article_id']
+    article = ArticlePost.objects.get(id=article_id)
+    user = request.user
+    if user.username != article.author.username:
+        return HttpResponse('You do not have permission!')
     try:
         article = ArticlePost.objects.get(id=article_id)
         article.delete()
@@ -121,10 +126,12 @@ def del_article(request):
 @login_required(login_url='/account/login')
 @csrf_exempt
 def redit_article(request, article_id):
-    user = User.objects.get(username=request.session.get('username',''))
+    article = ArticlePost.objects.get(id=article_id)
+    user = request.user
+    if user.username != article.author.username:
+        return HttpResponse('You do not have permission!')
     if request.method == "GET":
         article_columns = user.article_column.all()
-        article = ArticlePost.objects.get(id=article_id)
         # this_article_form = ArticlePostForm(initial={"title": article.title})
         this_article_column = article.column
         return render(request, "article/redit_article.html",
