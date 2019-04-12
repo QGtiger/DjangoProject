@@ -173,7 +173,7 @@ def my_image(request):
             with open(fname,'wb') as f:
                 for c in uploadimg.chunks():
                     f.write(c)
-            return HttpResponse(json.dumps({'status':200,'tips':'上传成功'}))
+            return HttpResponse(json.dumps({'status':200,'tips':'上传成功','photo':'/media/avator/{}.jpg'.format(username)}))
         except:
             return HttpResponse(json.dumps({'status':500,'tips':'上传失败'}))
     else:

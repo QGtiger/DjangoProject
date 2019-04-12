@@ -62,9 +62,9 @@
         <div class="layui-col-xs12 layui-col-md6" style="padding-left:100px">
             <div style="width:200px">
                 {% if userinfo.photo %}
-                <img src="/media/avator/{{ userinfo.photo | striptags }}?1433223" class="layui-circle" id="finalImg avator" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
+                <img src="/media/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="finalImg" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
                 {% else %}
-                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="finalImg avator">
+                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="finalImg">
                 {% endif %}
             </div>
             <div style="width:200px;display:flex;justify-content:center">
@@ -153,6 +153,7 @@ function publish_info(){
 
     //弹出图片裁剪框
     $("#replaceImg").on("click",function () {
+        console.log("Click the replaceImg");
         $(".tailoring-container").toggle();
     });
     //图像上传
@@ -215,7 +216,7 @@ function publish_info(){
             var cas = $('#tailoringImg').cropper('getCroppedCanvas');//获取被裁剪后的canvas
             var base64url = cas.toDataURL('image/png'); //转换为base64地址形式
             //console.log(base64url);
-            $("#finalImg").prop("src",base64url);//显示为图片的形式
+            $("#finalImg").attr("src",base64url);//显示为图片的形式
 
             //关闭裁剪框
             closeTailor();
@@ -261,7 +262,8 @@ function publish_info(){
                 contentType: false,
                 success: function(e){
                     if(e['status']=='200'){
-                        parent.location.reload();
+                        $('#avator').attr('src',res.photo+'?'+Math.random());
+                        $('#finalImg').attr('src',res.photo+'?'+Math.random());
                         layer.msg(e['tips']);
                     }else if(e['status'=='500']){
                         layer.msg(e['tips']);
