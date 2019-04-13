@@ -50,7 +50,6 @@ def article_content(request, article_id):
     if request.method == 'POST':
         comment = request.POST.get('comment','')
         user = request.user
-        print(user.username,comment)
         try:
             Comment.objects.create(article=article,commentator=user,body=comment)
             return HttpResponse(json.dumps({"static":200,"tips":"感谢您的评论"}))

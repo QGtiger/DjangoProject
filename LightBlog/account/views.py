@@ -17,7 +17,7 @@ import json
 @csrf_exempt
 def account_login(request):
     username = request.session.get('username')
-    title = ' LFBlog LOGIN '
+    title = ' LFBlog 登录 '
     unit_2 = '/account/register/'
     unit_2_name = ' 立即注册 '
     unit_1 = '/account/setpassword/'
@@ -47,7 +47,7 @@ def account_logout(request):
 @csrf_exempt
 def account_register(request):
     username = request.session.get('username')
-    title = ' LFBlog REGISTER '
+    title = ' LFBlog 注册 '
     unit_2 = '/account/login/'
     unit_2_name = ' 立即登录 '
     unit_1 = '/account/setpassword'
@@ -85,7 +85,7 @@ def account_setpassword(request):
     username = request.session.get('username')
     button = ' 获取验证码 '
     new_password = True
-    title = 'LFBlog SETPW'
+    title = 'LFBlog 修改密码'
     unit_2 = '/account/login/'
     unit_2_name = ' 立即登录 '
     unit_1 = '/account/register/'
