@@ -6,7 +6,7 @@
 
 
 
-    <div class="layui-row" style="margin:0 100px;">
+    <div class="layui-row" style="margin:0 5%;">
         <h1>{{ user.username }}'s Information</h1>
         <div class="layui-col-xs12 layui-col-md6">
 <form class="layui-form" action="." method="post">{% csrf_token %}
@@ -61,11 +61,7 @@
         </div>
         <div class="layui-col-xs12 layui-col-md6" style="padding-left:100px">
             <div style="width:200px">
-                {% if userinfo.photo %}
-                <img src="/media/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="finalImg" style="width:200px;height:200px;padding-bottom:10px" name="user_face">
-                {% else %}
-                <img name="user_face" src="/media/avator/1554199336240.jpg" class="layui-circle" style="width:200px;height:200px;padding-bottom:10px" id="finalImg">
-                {% endif %}
+                <img src="/media/avator/1554199336240.jpg" class="layui-circle avator" id="finalImg" style="width:200px;height:200px;padding-bottom:10px">
             </div>
             <div style="width:200px;display:flex;justify-content:center">
                 <button id="replaceImg" style="margin-right:10px" class="l-btn">更换图片</button>
@@ -262,8 +258,8 @@ function publish_info(){
                 contentType: false,
                 success: function(e){
                     if(e['status']=='200'){
-                        $('#avator').attr('src',res.photo+'?'+Math.random());
-                        $('#finalImg').attr('src',res.photo+'?'+Math.random());
+                        $('#avator').attr('src',e.photo+'?'+Math.random());
+                        $('#finalImg').attr('src',e.photo+'?'+Math.random());
                         layer.msg(e['tips']);
                     }else if(e['status'=='500']){
                         layer.msg(e['tips']);

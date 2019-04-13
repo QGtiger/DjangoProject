@@ -196,6 +196,7 @@ def get_avator(request):
 
 
 def author_info(request, username):
+    print(22)
     title = "{} 个人信息".format(username)
     user = User.objects.get(username=username)
     userinfo = UserInfo.objects.get(user=user)

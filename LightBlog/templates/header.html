@@ -7,7 +7,7 @@
     <a href="{% url 'account:my_information' %}">个人中心<span class="layui-badge-dot"></span></a>
   </li>
   <li class="layui-nav-item" lay-unselect="" style="float:right">
-    <a class="username" href="javascript:;"><img id="avator" src="http://qnpic.top/yoona%5C%E7%85%A7%E7%89%87%202019-3-8%20%E4%B8%8A%E5%8D%8810%2001%2024.jpg" class="layui-nav-img">{{ request.user.username }}</a>
+    <a href="javascript:;"><img id="avator" src="/media/avator/1554199336240.jpg" class="layui-nav-img avator">{{ request.user.username }}</a>
     <dl class="layui-nav-child">
         {% if request.session.username %}
       <dd><a href="{% url 'account:my_information' %}">个人信息</a></dd>
@@ -36,21 +36,12 @@
 	});
 
 	$(function(){
-	    username = $('.username').text();
-	    $.ajax({
-	        url: "{% url 'account:get_avator' %}",
-	        type: 'POST',
-	        data: {'username':username},
-	        success: function(e){
-	            res = JSON.parse(e);
-	            console.log(res);
-                if(res.static!=500){
-                    $('#avator').attr('src',res.photo+'?'+Math.random());
-                }else{
-                    layer.msg(res.tips);
-                }
-	        }
-	    })
+	    username = $('.username').val()
+	    if(username){
+	        $('.avator').attr('src','/media/avator/'+username+'.jpg?'+Math.random())
+	    }else{
+	        $('.avator').attr('src','/media/avator/1554199336240.jpg?'+Math.random())
+	    }
 	})
 
 

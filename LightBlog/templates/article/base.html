@@ -20,6 +20,11 @@
 <div>
     {% include 'header.html' %}
     <div  class="content" style="margin:10px 10px 100px 10px">
+        {% if request.user %}
+        <input class="username" type="hidden" value="{{ request.user.username }}">
+        {% else %}
+        <input class="username" type="hidden">
+        {% endif %}
     <div class="layui-col-md2">
         {% include 'article/leftslider.html' %}
     </div>

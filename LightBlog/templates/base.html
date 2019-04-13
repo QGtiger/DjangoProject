@@ -20,7 +20,12 @@
 </head>
 <body>
 {% include "header.html" %}
-<div class="container">
+<div>
+    {% if request.user.username %}
+        <input class="username" type="hidden" value="{{ request.user.username }}">
+        {% else %}
+        <input class="username" type="hidden">
+        {% endif %}
     {% block content %} {% endblock %}
 </div>
 {% include "footer.html" %}

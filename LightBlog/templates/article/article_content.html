@@ -3,7 +3,7 @@
 {% block title %}articles list{% endblock %}
 {% block content %}
 
-<div class="container" style="margin:20px 100px 0 100px">
+<div class="container">
     <div>
         <header>
             <h1 style="margin:20px 0">{{ article.title }}</h1>
@@ -129,7 +129,7 @@ function comment_like(id, action){
 }
 
 $('.comment-btn').on('click',function(){
-    if($('.username').text()==''){
+    if($('.username').val()==''){
         layer.msg('请先登录')
     }else{
         var comment = $('.comment_text').val();
