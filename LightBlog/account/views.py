@@ -12,6 +12,7 @@ from .models import UserInfo
 from django.contrib.auth.decorators import login_required
 from .forms import *
 import json
+import shutil
 
 # Create your views here.
 @csrf_exempt
@@ -74,6 +75,9 @@ def account_register(request):
             UserInfo.objects.create(user=user)
             login(request, user)
             request.session['username'] = username  # 验证是否登录成功，存储到session
+            default_img = '{}/avator/{}.jpg'.format(settings.MEDIA_ROOT, '1554199336240')
+            avator_img = '{}/avator/{}.jpg'.format(settings.MEDIA_ROOT, username)
+            shutil.copy(default_img,avator_img)
             # return redirect('/blog/')
             return HttpResponse(json.dumps({'status':5,'tips':' 注册成功,直接登录 '}))
             # tips = ' 注册成功 '
@@ -161,11 +165,10 @@ def myself_edit(request):
 @login_required(login_url='/account/login/')
 @csrf_exempt
 def my_image(request):
-    username = request.session.get('username','')
+    username = request.user.username
     if request.method == 'POST':
         uploadimg = request.FILES.get('uploadimg', '')
-        user = User.objects.get(username=username)
-        userinfo = UserInfo.objects.get(user=user)
+        userinfo = UserInfo.objects.get(user=request.user)
         userinfo.photo = username+'.jpg'
         userinfo.save()
         fname = '{}/avator/{}.jpg'.format(settings.MEDIA_ROOT, username)

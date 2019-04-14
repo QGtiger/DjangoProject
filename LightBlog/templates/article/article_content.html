@@ -3,11 +3,12 @@
 {% block title %} {{ article.title }} {% endblock %}
 {% block content %}
 
+{% with total_likes=article.users_like.count %}
 <div class="container">
     <div>
         <header>
             <h1 style="margin:20px 0">{{ article.title }}</h1>
-            <p style="padding-left:10px"><a href="{% url 'account:author_info' article.author.username %}">{{ article.author.username }}</a></p>
+            <p style="padding-left:10px"><a href="{% url 'account:author_info' article.author.username %}">{{ article.author.username }}</a><span style="margin-left:20px">{{ total_likes }} like{{ total_likes|pluralize }}</span><span style="margin-left:20px">{{ total_views }} view{{ total_views|pluralize }}</span></p>
         </header>
 
         <link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}"/>
@@ -57,14 +58,15 @@
                     </div>
                     <div class="commentator-info">
                         <a href="/account/author/{{ comment.commentator.username }}">{{ comment.commentator.username }}</a>
-                        <span>{{ comment.created | date:"Y-m-d H:i:s" }}</span>
+                        <span style="margin-left:20px"> {{ comment.created | date:"Y-m-d H:i:s" }}</span>
+                        <span style="margin-left:20px"> 人气值: <span class="support-comment">{{ comment.comment_like.count }}</span></span>
                     </div>
                     <div class="comment-wrap">
                         <p>{{ comment.body }}</p>
                     </div>
                     <div class="meta">
-                        <a href="" onclick="comment_like({{ comment.id }},'like')" data-anim="layui-anim-scaleSpring"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>
-                        <a href="#" onclick="comment_like({{ comment.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>
+                        <span onclick="comment_like({{ comment.id }},'like',{{ forloop.counter }})"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>
+                        <span onclick="comment_like({{ comment.id }},'unlike',{{ forloop.counter }})"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>
                     </div>
                 </div>
 
@@ -114,15 +116,24 @@ function is_like(id, action){
     })
 }
 
-function comment_like(id, action){
+function comment_like(id, action, n){
     $.ajax({
         url: "{% url 'article:comment_like' %}",
         type: "POST",
+        dataType: "json",
         data: {"id": id, "action": action},
-        success: function(e){
-            res = JOSN.parse(e);
-            if(res.static==200){
-
+        success: function(res){
+            console.log(res)
+            n = n -1;
+            dom = $(".history-comment ul li:eq("+n+")").find('.support-comment');
+            console.log(dom);
+            if(res.static=='200'){
+                dom.text(res.support_num);
+                layer.msg('感谢点赞');
+            }else if(res.static == '201'){
+                dom.text(res.support_num)
+            }else{
+                layer.msg(res.tips);
             }
         }
     })
@@ -151,4 +162,5 @@ $('.comment-btn').on('click',function(){
     }
 })
 </script>
+{% endwith %}
 {% endblock %}

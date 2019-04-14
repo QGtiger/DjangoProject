@@ -4,7 +4,17 @@
 {% block content %}
 
 <div class="container">
-    <h1>阅读，丰富头脑，善化行为</h1>
+    <h1>丰富头脑，善化行为</h1>
+
+    <div class="article_ranking" style="margin:20px 40px">
+        <h3>最受欢迎文章</h3>
+        <ol>
+            {% for article in most_viewed %}
+            <li><a href="{% url 'article:article_content' article.id %}">{{ forloop.counter }}. {{ article.title }}</a></li>
+            {% endfor %}
+        </ol>
+    </div>
+
     <!--{% for article in articles %}-->
     <!--<div class="list-group">-->
         <!--<a href="{% url 'article:article_content' article.id %}" class="list-group-item active">-->

@@ -159,9 +159,11 @@ def like_article(request):
             article = ArticlePost.objects.get(id=article_id)
             if action == 'like':
                 article.users_like.add(user)
-                return HttpResponse(json.dumps({'static':200,'tips':'感谢您的喜爱'}))
+                num = article.users_like.count()
+                return HttpResponse(json.dumps({'static':200,'tips':'感谢您的喜爱','num':num}))
             else:
                 article.users_like.remove(user)
-                return HttpResponse(json.dumps({'static':201,'tips':'我会努力的'}))
+                num = article.users_like.count()
+                return HttpResponse(json.dumps({'static':201,'tips':'我会努力的', 'num':num}))
         except:
             return HttpResponse(json.dumps({'static':500,'tips':'系统错误,重新尝试'}))
