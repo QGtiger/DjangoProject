@@ -65,8 +65,8 @@
                         <p>{{ comment.body }}</p>
                     </div>
                     <div class="meta">
-                        <span onclick="comment_like({{ comment.id }},'like',{{ forloop.counter }})"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>
-                        <span onclick="comment_like({{ comment.id }},'unlike',{{ forloop.counter }})"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>
+                        <span onclick="comment_like({{ comment.id }},'like',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>
+                        <span onclick="comment_like({{ comment.id }},'unlike',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>
                     </div>
                 </div>
 
@@ -117,26 +117,28 @@ function is_like(id, action){
 }
 
 function comment_like(id, action, n){
-    $.ajax({
-        url: "{% url 'article:comment_like' %}",
-        type: "POST",
-        dataType: "json",
-        data: {"id": id, "action": action},
-        success: function(res){
-            console.log(res)
-            n = n -1;
-            dom = $(".history-comment ul li:eq("+n+")").find('.support-comment');
-            console.log(dom);
-            if(res.static=='200'){
-                dom.text(res.support_num);
-                layer.msg('感谢点赞');
-            }else if(res.static == '201'){
-                dom.text(res.support_num)
-            }else{
-                layer.msg(res.tips);
+    if($('.username').val()==''){
+        layer.msg('请先登录')
+    }else{
+        dom = $(n).parent().parent().find(".support-comment");
+        $.ajax({
+            url: "{% url 'article:comment_like' %}",
+            type: "POST",
+            dataType: "json",
+            data: {"id": id, "action": action},
+            success: function(res){
+                console.log(res)
+                if(res.static=='200'){
+                    dom.text(res.support_num);
+                    layer.msg('感谢点赞');
+                }else if(res.static == '201'){
+                    dom.text(res.support_num)
+                }else{
+                    layer.msg(res.tips);
+                }
             }
-        }
-    })
+        })
+    }
 }
 
 $('.comment-btn').on('click',function(){
@@ -149,13 +151,36 @@ $('.comment-btn').on('click',function(){
             type: "POST",
             data: {'comment':comment },
             success: function(e){
+                $('.comment_text').val('');
                 res = JSON.parse(e);
                 if(res.static='200'){
-                    layer.confirm(res.tips,{
-                        btn: ['嗯']
-                    },function(){
-                        window.location.reload();
-                    });
+                    console.log(res);
+                    commentator = res.comment_info;
+                    prepend_li='<li>'+
+                '<div class="commentator">'+
+                    '<div class="commentator-img">'+
+                        '<a href="/account/author/'+commentator.commentator+'">'+
+                            '<img src="/media/avator/'+commentator.commentator+'.jpg" class="layui-nav-img" alt="">'+
+                        '</a>'+
+                    '</div>'+
+                    '<div class="commentator-info">'+
+                        '<a href="/account/author/'+commentator.commentator+'">'+commentator.commentator+'</a>'+
+                        '<span style="margin-left:20px">'+commentator.created+'</span>'+
+                        '<span style="margin-left:20px"> 人气值: <span class="support-comment">0</span></span>'+
+                    '</div>'+
+                    '<div class="comment-wrap">'+
+                        '<p>'+commentator.body+'</p>'+
+                    '</div>'+
+                    '<div class="meta">'+
+                        '<span onclick="comment_like('+commentator.id+',\'like\',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>'+
+                        '<span onclick="comment_like('+commentator.id+',\'unlike\',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>'+
+                    '</div>'+
+                '</div>'+
+            '</li>'
+
+                    $('.history-comment ul').prepend(prepend_li);
+                }else{
+                    layer.msg(res.tips);
                 }
             }
         })

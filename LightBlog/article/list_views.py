@@ -49,8 +49,8 @@ def article_content(request, article_id):
         try:
             C = Comment(article=article,commentator=user,body=comment)
             C.save()
-            # comment_info = {'commentator':user.username,'id': C.id, 'body': C.body, 'created': C.created.strftime("%Y-%m-%d %H:%M:%S")}
-            return HttpResponse(json.dumps({"static":200,"tips":"感谢您的评论"}))
+            comment_info = {'commentator':user.username,'id': C.id, 'body': C.body, 'created': C.created.strftime("%Y-%m-%d %H:%M:%S")}
+            return HttpResponse(json.dumps({"static":200,"tips":"感谢您的评论", 'comment_info':comment_info}))
         except:
             return HttpResponse(json.dumps({"static":500,"tips":"评论系统出现错误"}))
     else:
