@@ -1,5 +1,5 @@
 $(function () {
-    var socket = io.connect('http://127.0.0.1:3000/');
+    var socket = io.connect('http://39.108.219.55:2333/');
 
     var _username = null;
 

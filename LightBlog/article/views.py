@@ -157,13 +157,17 @@ def like_article(request):
     if article_id and action:
         try:
             article = ArticlePost.objects.get(id=article_id)
+            article_likes = article.users_like.all()
             if action == 'like':
+                for item in article_likes:
+                    if item == user:
+                        return HttpResponse(json.dumps({'static':200,'tips':'不能重复点┗|｀O′|┛ 嗷~~~，亲[呕]^-^'}))
                 article.users_like.add(user)
                 num = article.users_like.count()
-                return HttpResponse(json.dumps({'static':200,'tips':'感谢您的喜爱','num':num}))
+                return HttpResponse(json.dumps({'static':201,'tips':'感谢您的喜爱','num':num,'user':user.username}))
             else:
                 article.users_like.remove(user)
                 num = article.users_like.count()
-                return HttpResponse(json.dumps({'static':201,'tips':'我会努力的', 'num':num}))
+                return HttpResponse(json.dumps({'static':202,'tips':'我会努力的', 'num':num,'user':user.username}))
         except:
             return HttpResponse(json.dumps({'static':500,'tips':'系统错误,重新尝试'}))

@@ -19,17 +19,17 @@
         </div>
     </div>
     <div style="text-align:center">
-        <a href="#" onclick="is_like({{ article.id }},'like')"><span><i class="layui-icon layui-icon-praise"></i>like</span></a>
+        <a href="javascript:void(0);" onclick="is_like({{ article.id }},'like')"><span><i class="layui-icon layui-icon-praise"></i>like</span></a>
         <span style="display:inline-block;width:50px"></span>
-        <a href="#" onclick="is_like({{ article.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i>unlike</span></a>
+        <a href="javascript:void(0);" onclick="is_like({{ article.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i>unlike</span></a>
     </div>
-    <div style="text-align:center">
-        <p><strong>点赞本文的读者</strong></p>
+    <div class="support-article-users" style="text-align:center">
         {% for user in article.users_like.all %}
-        <p><a href="{% url 'account:author_info' user.username %}">{{ user.username }}</a></p>
+        <p><a class="support-user {{ user.username }}" href="{% url 'account:author_info' user.username %}">{{ user.username }}</a></p>
         {% empty %}
-        <p>还没有人对此文表态</p>
+        <p class="nobody-support">还没有人对此文表态</p>
         {% endfor %}
+        <p><strong>点赞本文的读者</strong></p>
     </div>
     <div class="comment">
         <form action="" method="POST">{% csrf_token %}
@@ -47,7 +47,7 @@
         </form>
     </div>
     <div class="history-comment">
-        <ul>
+        <ul style="padding-bottom:100px">
             {% for comment in comments %}
             <li>
                 <div class="commentator">
@@ -65,8 +65,8 @@
                         <p>{{ comment.body }}</p>
                     </div>
                     <div class="meta">
-                        <span onclick="comment_like({{ comment.id }},'like',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>
-                        <span onclick="comment_like({{ comment.id }},'unlike',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>
+                        <a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'like',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>
+                        <a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'unlike',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>
                     </div>
                 </div>
 
@@ -105,12 +105,20 @@ function is_like(id, action){
         type: 'POST',
         dataType: 'json',
         success: function(e){
-            if(e.static!='500'){
-                layer.confirm(e.tips,{
-                        btn: ['确定']
-                    },function(){
-                        window.location.reload();
-                    });
+            if(e.static=='200'){
+                layer.msg(e.tips,{time:1500});
+            }else if(e.static=='201'){
+                layer.msg(e.tips,{time:1500});
+                $('.support-article-users').prepend('<p><a class="'+e.user+'" href="{% url 'account:author_info' request.user.username %}">'+e.user+'</a></p>');
+                $('.nobody-support').css('display','none');
+            }else if(e.static=='202'){
+                layer.msg(e.tips,{time:1500});
+                $('.'+e.user).remove();
+                if($('.support-user').length==0){
+                    $('.nobody-support').css('display','block');
+                }
+            }else{
+                layer.msg(e.tips,{time:1500});
             }
         }
     })
