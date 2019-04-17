@@ -144,29 +144,34 @@ function comment_report(){
 }
 
 function is_like(id, action){
-    $.ajax({
-        url: "{% url 'article:like_article' %}",
-        data: {'id': id,'action':action},
-        type: 'POST',
-        dataType: 'json',
-        success: function(e){
-            if(e.static=='200'){
-                layer.msg(e.tips,{time:1500});
-            }else if(e.static=='201'){
-                layer.msg(e.tips,{time:1500});
-                $('.support-article-users').prepend('<p><a class="'+e.user+'" href="{% url 'account:author_info' request.user.username %}">'+e.user+'</a></p>');
-                $('.nobody-support').css('display','none');
-            }else if(e.static=='202'){
-                layer.msg(e.tips,{time:1500});
-                $('.'+e.user).remove();
-                if($('.support-user').length==0){
-                    $('.nobody-support').css('display','block');
+    onuser = $('.username').val();
+    if(onuser==''){
+        layer.msg('请先登录')
+    }else{
+        $.ajax({
+            url: "{% url 'article:like_article' %}",
+            data: {'id': id,'action':action},
+            type: 'POST',
+            dataType: 'json',
+            success: function(e){
+                if(e.static=='200'){
+                    layer.msg(e.tips,{time:1500});
+                }else if(e.static=='201'){
+                    layer.msg(e.tips,{time:1500});
+                    $('.support-article-users').prepend('<p><a class="'+e.user+'" href="/account/author/'+onuser+'">'+e.user+'</a></p>');
+                    $('.nobody-support').css('display','none');
+                }else if(e.static=='202'){
+                    layer.msg(e.tips,{time:1500});
+                    $('.'+e.user).remove();
+                    if($('.support-user').length==0){
+                        $('.nobody-support').css('display','block');
+                    }
+                }else{
+                    layer.msg(e.tips,{time:1500});
                 }
-            }else{
-                layer.msg(e.tips,{time:1500});
             }
-        }
-    })
+        })
+    }
 }
 
 function comment_like(id, action, n){
