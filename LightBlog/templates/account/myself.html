@@ -5,48 +5,48 @@
 {% block content %}
 
 
-    <h1 style="margin:0 100px">{{ title }}</h1>
-    <div class="layui-row" style="margin:0 5%;font-size:18px">
+    <h1 style="text-align:center">{{ title }}</h1>
+    <div class="layui-row" style="margin:0 5%;font-size:17px">
 
         <div class="layui-col-xs12 layui-col-md8">
             <div class="lay-row">
-                <div class="layui-col-xs4 text-right">用户名:</div>
-                <div class="layui-col-xs8 text-left">{{user.username}}</div>
+                <div class="layui-col-xs4">用户名:</div>
+                <div class="layui-col-xs8">{{user.username}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>邮箱:</span></div>
-                <div class="layui-col-xs8 text-left">{{user.email}}</div>
+                <div class="layui-col-xs4"><span>邮箱:</span></div>
+                <div class="layui-col-xs8">{{user.email}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>毕业学校:</span></div>
-                <div class="layui-col-xs8 text-left">{{userinfo.school}}</div>
+                <div class="layui-col-xs4"><span>毕业学校:</span></div>
+                <div class="layui-col-xs8">{{userinfo.school}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>工作单位:</span></div>
-                <div class="layui-col-xs8 text-left">{{userinfo.company}}</div>
+                <div class="layui-col-xs4"><span>工作单位:</span></div>
+                <div class="layui-col-xs8">{{userinfo.company}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>职业:</span></div>
-                <div class="layui-col-xs8 text-left">{{userinfo.profession}}</div>
+                <div class="layui-col-xs4"><span>职业:</span></div>
+                <div class="layui-col-xs8">{{userinfo.profession}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>地址:</span></div>
-                <div class="layui-col-xs8 text-left">{{userinfo.address}}</div>
+                <div class="layui-col-xs4"><span>地址:</span></div>
+                <div class="layui-col-xs8">{{userinfo.address}}</div>
             </div>
 
             <div class="layui-row">
-                <div class="layui-col-xs4 text-right"><span>个人介绍:</span></div>
-                <div class="layui-col-xs8 text-left">{{userinfo.aboutme}}</div>
+                <div class="layui-col-xs4"><span>个人介绍:</span></div>
+                <div class="layui-col-xs8">{{userinfo.aboutme}}</div>
             </div>
 
         </div>
 
-        <div class="layui-col-xs12 layui-col-md4" style="padding-left:100px">
+        <div class="layui-col-xs12 layui-col-md4" style="display:flex;justify-content:center;padding-top:20px">
             <div style="width:200px">
                 {% if userinfo.photo %}
                 <img src="/media/avator/{{ userinfo.photo | striptags }}" class="layui-circle" id="my_photo" style="width:200px;height:200px;padding-bottom:10px">
@@ -56,6 +56,61 @@
             </div>
         </div>
     </div>
+
+    <div style="margin:0 5%;">
+    <!--{% for article in articles %}-->
+    <!--<div class="list-group">-->
+        <!--<a href="{% url 'article:article_content' article.id %}" class="list-group-item active">-->
+            <!--<h3 class="list-group-item-heading">{{article.title}}</h3>-->
+        <!--</a>-->
+        <!--<p class="list-group-item-text">概要:{{article.body|slice:'70'| linebreaks}}</p>-->
+    <!--</div>-->
+    <!--{% endfor %}-->
+        <ul id="flow_myself" ></ul>
+    </div>
+
+
+
+<script type="text/javascript">
+	layui.use(['layer','flow'],function(){
+		var layer = layui.layer;
+		var flow = layui.flow;
+
+		flow.load({
+			elem: "#flow_myself",
+			is_Auto:true,
+			end: "emm,nothing next",
+			is_Lazyimg: true,
+			done: function(page,next){
+				var lis = '';
+				$.get('/account/article_page/?page='+page, function(e){
+				    parse_res = JSON.parse(e)
+                    res = parse_res.data
+                    page_num = parse_res.page_num
+                    console.log(res)
+				    for(var i = 0; i < res.length; i++){
+
+                        var item = '<div class="list-group">'+
+                            '<a href="/article/article_content/'+res[i].id+'" class="list-group-item active">'+
+                                '<h3 class="list-group-item-heading">'+res[i].title+'</h3>'+
+                            '</a>'+
+                            '<p class="list-group-item-text">概要:'+res[i].body+'</p>'+
+                            '<p class="meta"><span><i class="layui-icon layui-icon-praise"></i> '+res[i].users_like+'</span>'+
+                            '<span class="update_time">'+res[i].updated+'</span>'+
+                            '</p>'+
+                        '</div>';
+
+                        lis+=item;
+
+				    }
+				    next(lis,page<page_num)
+				})
+
+
+			}
+		})
+	})
+</script>
 
 <script>
     $(function(){

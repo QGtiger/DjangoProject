@@ -80,3 +80,17 @@ def comment_like(request):
                 return HttpResponse(json.dumps({'static':201, 'support_num':num}))
         except:
             return HttpResponse(json.dumps({'static':500,'tips':'系统错误,重新尝试'}))
+
+@csrf_exempt
+@require_POST
+def comment_delete(request):
+    comment_id = request.POST['id']
+    comment = Comment.objects.get(id=comment_id)
+    try:
+        if(request.user == comment.commentator):
+            comment.delete()
+            return HttpResponse(json.dumps({'static':201, 'tips':'评论已删除'}))
+        else:
+            return HttpResponse(json.dumps({'static':502, 'tips':"You don't have permission.."}))
+    except:
+        return HttpResponse(json.dumps({'static':500, 'tips':'Something Error...'}))

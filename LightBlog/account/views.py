@@ -8,11 +8,14 @@ import random
 from django.contrib.auth.hashers import make_password
 import re
 from django.views.decorators.http import require_POST
+from django.core.paginator import PageNotAnInteger,Paginator,EmptyPage
 from .models import UserInfo
 from django.contrib.auth.decorators import login_required
+from article.models import ArticlePost
 from .forms import *
 import json
 import shutil
+
 
 # Create your views here.
 @csrf_exempt
@@ -138,6 +141,26 @@ def myself(request):
     user = User.objects.get(username=username)
     userinfo = UserInfo.objects.get(user=user)
     return render(request,'account/myself.html',locals())
+
+
+def article_page(request):
+    article_titles = request.user.article_post.all()
+    paginator = Paginator(article_titles, 6)
+    page = request.GET.get('page')
+    try:
+        current_page = paginator.page(page)
+        articles = current_page.object_list
+    except PageNotAnInteger:
+        current_page = paginator.page(1)
+        articles = current_page.object_list
+    except EmptyPage:
+        current_page = paginator.page(paginator.num_pages)
+        articles = current_page.object_list
+    articles_json = []
+    for i in range(len(articles)):
+        articles_json.append({'id':articles[i].id,'title':articles[i].title,'updated':articles[i].updated.strftime("%Y-%m-%d %H:%M:%S"),'body':articles[i].body[:70],'users_like':articles[i].users_like.count()})
+    #return HttpResponse(serializers.serialize("json",articles))
+    return HttpResponse(json.dumps({'static':200,'data':articles_json,'page_num':paginator.num_pages}))
 
 
 @login_required(login_url='/account/login/')

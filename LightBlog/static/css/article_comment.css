@@ -31,3 +31,14 @@
 .comment-wrap{
 	padding:10px;
 }
+
+
+.commentator .meta .comment-tool{
+	float:right;
+	color: #b4b4b4 !important;
+	display: none;
+}
+
+.commentator .meta .comment-tool:hover{
+	color: black !important;
+}

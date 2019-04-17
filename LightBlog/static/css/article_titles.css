@@ -13,6 +13,10 @@
 	margin:0 0 7px 0;
 }
 
+.list-group .list-group-item-text{
+    padding: 8px 10px;
+}
+
 .meta span{
     color: #b4b4b4 !important;
 }
