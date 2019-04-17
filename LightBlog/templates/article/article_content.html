@@ -211,7 +211,7 @@ $('.comment-btn').on('click',function(){
             success: function(e){
                 $('.comment_text').val('');
                 res = JSON.parse(e);
-                if(res.static='200'){
+                if(res.code==200){
                     console.log(res);
                     commentator = res.comment_info;
                     prepend_li='<li onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
@@ -230,8 +230,8 @@ $('.comment-btn').on('click',function(){
                         '<p>'+commentator.body+'</p>'+
                     '</div>'+
                     '<div class="meta">'+
-                        '<span onclick="comment_like('+commentator.id+',\'like\',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></span>'+
-                        '<span onclick="comment_like('+commentator.id+',\'unlike\',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></span>'+
+                        '<a href="javascript:void(0)" onclick="comment_like('+commentator.id+',\'like\',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>'+
+                        '<a href="javascript:void(0)" onclick="comment_like('+commentator.id+',\'unlike\',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>'+
                         '<a href="javascript:void(0)" onclick="comment_delete('+ commentator.id +', this)" class="comment-tool comment-delete">删 除</a>'+
                     '</div>'+
                 '</div>'+

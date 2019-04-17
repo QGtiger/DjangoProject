@@ -42,18 +42,21 @@ def article_page(request):
 
 @csrf_exempt
 def article_content(request, article_id):
-    article = get_object_or_404(ArticlePost, id=article_id)
     if request.method == 'POST':
+        if request.user.username == "":
+            return HttpResponse(json.dumps({'code': 502, 'tips':'What are u doing now??'}))
         comment = request.POST.get('comment','')
-        user = request.user
         try:
+            user = request.user
+            article = get_object_or_404(ArticlePost, id=article_id)
             C = Comment(article=article,commentator=user,body=comment)
             C.save()
             comment_info = {'commentator':user.username,'id': C.id, 'body': C.body, 'created': C.created.strftime("%Y-%m-%d %H:%M:%S")}
-            return HttpResponse(json.dumps({"static":200,"tips":"感谢您的评论", 'comment_info':comment_info}))
+            return HttpResponse(json.dumps({"code":200,"tips":"感谢您的评论", 'comment_info':comment_info}))
         except:
-            return HttpResponse(json.dumps({"static":500,"tips":"评论系统出现错误"}))
+            return HttpResponse(json.dumps({"code":501, "tips":"评论系统出现错误"}))
     else:
+        article = get_object_or_404(ArticlePost, id=article_id)
         total_views = r.incr("article:{}:views".format(article_id))
         r.zincrby('article_ranking', 1, article_id)
         comments = Comment.objects.filter(article=article)
