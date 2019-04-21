@@ -47,37 +47,38 @@
         </form>
     </div>
     <div class="history-comment">
-        <ul>
-            {% for comment in comments %}
-            <li onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">
-                <div class="commentator">
-                    <div class="commentator-img">
-                        <a href="/account/author/{{ comment.commentator.username }}">
-                            <img src="/media/avator/{{ comment.commentator.username }}.jpg" class="layui-nav-img" alt="">
-                        </a>
-                    </div>
-                    <div class="commentator-info">
-                        <a href="/account/author/{{ comment.commentator.username }}">{{ comment.commentator.username }}</a>
-                        <span style="margin-left:20px"> {{ comment.created | date:"Y-m-d H:i:s" }}</span>
-                        <span style="margin-left:20px"> 人气值: <span class="support-comment">{{ comment.comment_like.count }}</span></span>
-                    </div>
-                    <div class="comment-wrap">
-                        <p>{{ comment.body }}</p>
-                    </div>
-                    <div class="meta">
-                        <a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'like',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>
-                        <a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'unlike',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>
-                        {% if request.user.username == comment.commentator.username %}
-                        <a href="javascript:void(0)" onclick="comment_delete({{ comment.id }}, this)" class="comment-tool comment-delete">删 除</a>
-                        {% else %}
-                        <a href="javascript:void(0)" onclick="comment_report()" class="comment-tool comment-report">举 报</a>
-                        {% endif %}
-                    </div>
-                </div>
+        <!--<ul>-->
+            <!--{% for comment in comments %}-->
+            <!--<li onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">-->
+                <!--<div class="commentator">-->
+                    <!--<div class="commentator-img">-->
+                        <!--<a href="/account/author/{{ comment.commentator.username }}">-->
+                            <!--<img src="/media/avator/{{ comment.commentator.username }}.jpg" class="layui-nav-img" alt="">-->
+                        <!--</a>-->
+                    <!--</div>-->
+                    <!--<div class="commentator-info">-->
+                        <!--<a href="/account/author/{{ comment.commentator.username }}">{{ comment.commentator.username }}</a>-->
+                        <!--<span style="margin-left:20px"> {{ comment.created | date:"Y-m-d H:i:s" }}</span>-->
+                        <!--<span style="margin-left:20px"> 人气值: <span class="support-comment">{{ comment.comment_like.count }}</span></span>-->
+                    <!--</div>-->
+                    <!--<div class="comment-wrap">-->
+                        <!--<p>{{ comment.body }}</p>-->
+                    <!--</div>-->
+                    <!--<div class="meta">-->
+                        <!--<a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'like',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>-->
+                        <!--<a href="javascript:void(0)" onclick="comment_like({{ comment.id }},'unlike',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>-->
+                        <!--{% if request.user.username == comment.commentator.username %}-->
+                        <!--<a href="javascript:void(0)" onclick="comment_delete({{ comment.id }}, this)" class="comment-tool comment-delete">删 除</a>-->
+                        <!--{% else %}-->
+                        <!--<a href="javascript:void(0)" onclick="comment_report()" class="comment-tool comment-report">举 报</a>-->
+                        <!--{% endif %}-->
+                    <!--</div>-->
+                <!--</div>-->
 
-            </li>
-            {% endfor %}
-        </ul>
+            <!--</li>-->
+            <!--{% endfor %}-->
+        <!--</ul>-->
+        <ul id="flow_comments"></ul>
     </div>
 </div>
 
@@ -102,6 +103,75 @@ $(function(){
     });
 
 });
+
+layui.use(['layer', 'flow'], function(){
+    var flow = layui.flow;
+    flow.load({
+        elem: '#flow_comments',
+        isAuto: false,
+        done: function(page, next){
+            var lis = '';
+            $.get('/article/article_comment/{{ article.id }}/?page='+page, function(e){
+                res = JSON.parse(e);
+                console.log(res);
+                nums = res.page_num
+                comments = res.res
+                for(var i = 0; i < comments.length; i++){
+                    var item = '';
+                    if('{{request.user.username}}' == comments[i].commentator){
+                        var item = '<li onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator">'+
+                        '<div class="commentator-img">'+
+                            '<a href="/account/author/'+comments[i].commentator+'">'+
+                                '<img src="/media/avator/'+comments[i].commentator+'.jpg" class="layui-nav-img" alt="">'+
+                            '</a>'+
+                        '</div>'+
+                        '<div class="commentator-info">'+
+                            '<a href="/account/author/'+comments[i].commentator+'">'+comments[i].commentator+'</a>'+
+                            '<span style="margin-left:20px">'+ comments[i].created+'</span>'+
+                            '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comments[i].comment_like+'</span></span>'+
+                        '</div>'+
+                        '<div class="comment-wrap">'+
+                            '<p>'+comments[i].body+'</p>'+
+                        '</div>'+
+                        '<div class="meta">'+
+                            '<a href="javascript:void(0)" onclick="comment_like('+comments[i].id+',\'like\',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>'+
+                            '<a href="javascript:void(0)" onclick="comment_like('+comments[i].id+',\'unlike\',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>'+
+                            '<a href="javascript:void(0)" onclick="comment_delete('+comments[i].id+', this)" class="comment-tool comment-delete">删 除</a>'+
+                        '</div>'+
+                    '</div>'+
+                    '</li>'
+                    }else{
+                        var item = '<li onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator">'+
+                        '<div class="commentator-img">'+
+                            '<a href="/account/author/'+comments[i].commentator+'">'+
+                                '<img src="/media/avator/'+comments[i].commentator+'.jpg" class="layui-nav-img" alt="">'+
+                            '</a>'+
+                        '</div>'+
+                        '<div class="commentator-info">'+
+                            '<a href="/account/author/'+comments[i].commentator+'">'+comments[i].commentator+'</a>'+
+                            '<span style="margin-left:20px">'+ comments[i].created+'</span>'+
+                            '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comments[i].comment_like+'</span></span>'+
+                        '</div>'+
+                        '<div class="comment-wrap">'+
+                            '<p>'+comments[i].body+'</p>'+
+                        '</div>'+
+                        '<div class="meta">'+
+                            '<a href="javascript:void(0)" onclick="comment_like('+comments[i].id+',\'like\',this)"><span><i class="layui-icon layui-icon-praise"></i> <span class="comment-like">赞</span></span></a>'+
+                            '<a href="javascript:void(0)" onclick="comment_like('+comments[i].id+',\'unlike\',this)"><span><i class="layui-icon layui-icon-tread"></i> <span class="comment-unlike">踩</span></span></a>'+
+                            '<a href="javascript:void(0)" onclick="comment_report()" class="comment-tool comment-report">举 报</a>'+
+                        '</div>'+
+                    '</div>'+
+                    '</li>'
+                    }
+                    lis+=item;
+                }
+                next(lis, page<nums)
+            })
+        }
+    })
+})
 
 function EnterFunction(e){
     $(e).find('.comment-tool').css('display','block');

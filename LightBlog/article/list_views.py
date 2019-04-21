@@ -97,3 +97,23 @@ def comment_delete(request):
             return HttpResponse(json.dumps({'static':502, 'tips':"You don't have permission.."}))
     except:
         return HttpResponse(json.dumps({'static':500, 'tips':'Something Error...'}))
+
+
+def comment_page(request, article_id):
+    article = get_object_or_404(ArticlePost, id=article_id)
+    comments_all = article.comments.all()
+    paginator = Paginator(comments_all,6)
+    page = request.GET['page']
+    try:
+        current_page = paginator.page(page)
+        comments = current_page.object_list
+    except PageNotAnInteger:
+        current_page = paginator.page(1)
+        comments = current_page.object_list
+    except EmptyPage:
+        current_page = paginator.page(paginator.num_pages)
+        comments = current_page.object_list
+    comments_list=[]
+    for item in comments:
+        comments_list.append({'id':item.id ,'commentator': item.commentator.username, 'created': item.created.strftime("%Y-%m-%d %H:%M:%S"), 'comment_like': item.comment_like.count(), 'body': item.body})
+    return HttpResponse(json.dumps({'code':200, 'res': comments_list, 'page_num': paginator.num_pages}))

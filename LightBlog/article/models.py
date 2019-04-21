@@ -25,8 +25,8 @@ class ArticlePost(models.Model):
     users_like = models.ManyToManyField(User,related_name="users_like",blank=True)
 
     class Meta:
-        ordering=("-updated",)
-        index_together=(("id","slug"),)
+        ordering = ("-updated",)
+        index_together = (("id","slug"),)
 
     def __str__(self):
         return self.title
@@ -40,7 +40,7 @@ class Comment(models.Model):
     article = models.ForeignKey(ArticlePost, on_delete=models.CASCADE, related_name="comments")
     commentator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="commentator")
     body = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     comment_like = models.ManyToManyField(User, related_name="comment_like", blank=True)
 
     class Meta:
