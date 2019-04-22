@@ -13,5 +13,5 @@ urlpatterns = [
     path(r'my-image/', views.my_image, name="my_image"),
     path(r'get_avator/',views.get_avator, name='get_avator'),
     path(r'author/<path:username>', views.author_info, name='author_info'),
-    path(r'article_page/', views.article_page, name="article_page"),
+    path(r'article_page/<path:username>', views.article_page, name="article_page"),
 ]

@@ -85,7 +85,7 @@
 			is_Lazyimg: true,
 			done: function(page,next){
 				var lis = '';
-				$.get('/account/article_page/?page='+page, function(e){
+				$.get('/account/article_page/{{user.username}}?page='+page, function(e){
 				    parse_res = JSON.parse(e)
                     res = parse_res.data
                     page_num = parse_res.page_num

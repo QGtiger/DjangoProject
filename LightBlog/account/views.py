@@ -143,8 +143,9 @@ def myself(request):
     return render(request,'account/myself.html',locals())
 
 
-def article_page(request):
-    article_titles = request.user.article_post.all()
+def article_page(request, username):
+    user = User.objects.get(username=username)
+    article_titles = user.article_post.all()
     paginator = Paginator(article_titles, 6)
     page = request.GET.get('page')
     try:
@@ -222,7 +223,6 @@ def get_avator(request):
 
 
 def author_info(request, username):
-    print(22)
     title = "{} 个人信息".format(username)
     user = User.objects.get(username=username)
     userinfo = UserInfo.objects.get(user=user)
