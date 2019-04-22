@@ -1,35 +1,54 @@
 {% extends "base.html" %}
+{% load  article_tags %}
 {% load staticfiles %}
 {% block title %} {{ article.title }} {% endblock %}
 {% block content %}
 
 {% with total_likes=article.users_like.count %}
 <div class="container">
-    <div>
-        <header>
-            <h1 style="margin:20px 0">{{ article.title }}</h1>
-            <p style="padding-left:10px"><a href="{% url 'account:author_info' article.author.username %}">{{ article.author.username }}</a><span style="margin-left:20px">{{ total_likes }} like{{ total_likes|pluralize }}</span><span style="margin-left:20px">{{ total_views }} view{{ total_views|pluralize }}</span></p>
-        </header>
+    <div class="layui-row">
+        <div class="layui-col-xs12 layui-col-md8">
+            <div>
+                <header>
+                    <h1 style="margin:20px 0">{{ article.title }}</h1>
+                    <p style="padding-left:10px"><a href="{% url 'account:author_info' article.author.username %}">{{ article.author.username }}</a><span style="margin-left:20px">{{ total_likes }} like{{ total_likes|pluralize }}</span><span style="margin-left:20px">{{ total_views }} view{{ total_views|pluralize }}</span></p>
+                </header>
 
-        <link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}"/>
-        <div id='editormd-view'>
-        <textarea id="append-test" style="display:none;">
-{{ article.body }}
-        </textarea>
+                <link rel="stylesheet" href="{% static 'editor/css/editormd.preview.css' %}"/>
+                <div id='editormd-view'>
+                <textarea id="append-test" style="display:none;">
+        {{ article.body }}
+                </textarea>
+                </div>
+            </div>
+            <div style="text-align:center">
+                <a href="javascript:void(0);" onclick="is_like({{ article.id }},'like')"><span><i class="layui-icon layui-icon-praise"></i>like</span></a>
+                <span style="display:inline-block;width:50px"></span>
+                <a href="javascript:void(0);" onclick="is_like({{ article.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i>unlike</span></a>
+            </div>
+            <div class="support-article-users" style="text-align:center">
+                {% for user in article.users_like.all %}
+                <p><a class="support-user {{ user.username }}" href="{% url 'account:author_info' user.username %}">{{ user.username }}</a></p>
+                {% empty %}
+                <p class="nobody-support">还没有人对此文表态</p>
+                {% endfor %}
+                <p><strong>点赞本文的读者</strong></p>
+            </div>
         </div>
-    </div>
-    <div style="text-align:center">
-        <a href="javascript:void(0);" onclick="is_like({{ article.id }},'like')"><span><i class="layui-icon layui-icon-praise"></i>like</span></a>
-        <span style="display:inline-block;width:50px"></span>
-        <a href="javascript:void(0);" onclick="is_like({{ article.id }},'unlike')"><span><i class="layui-icon layui-icon-tread"></i>unlike</span></a>
-    </div>
-    <div class="support-article-users" style="text-align:center">
-        {% for user in article.users_like.all %}
-        <p><a class="support-user {{ user.username }}" href="{% url 'account:author_info' user.username %}">{{ user.username }}</a></p>
-        {% empty %}
-        <p class="nobody-support">还没有人对此文表态</p>
-        {% endfor %}
-        <p><strong>点赞本文的读者</strong></p>
+        <div class="layui-col-xs12 layui-col-md4" style="padding:20px 50px">
+            <h3 style="text-align:center">最新文章</h3>
+            {% latest_articles 4 %}
+            <hr>
+            <h3 style="text-align:center">最多评论文章</h3>
+            {% most_commented_articles as articles %}
+            <ul>
+                {% for article in articles %}
+                <li>
+                    <a href="{% url 'article:article_content' article.id %}">{{ forloop.counter }}.{{ article.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
     <div class="comment">
         <form action="" method="POST">{% csrf_token %}

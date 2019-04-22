@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% load article_tags %}
 {% load staticfiles %}
 {% block title %} 博客首页 {% endblock %}
 {% block content %}
 
 <div class="container">
     <h1>丰富头脑，善化行为</h1>
+    <p>There are {% total_articles %}  articles which you can read.</p>
 
     <div class="article_ranking" style="margin:20px 40px">
         <h3>最受欢迎文章</h3>
