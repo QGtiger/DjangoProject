@@ -5,6 +5,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import ArticlePost,Comment
+from comment.models import Comment_reply
 from django.conf import settings
 import json
 import redis
@@ -59,7 +60,6 @@ def article_content(request, article_id):
         article = get_object_or_404(ArticlePost, id=article_id)
         total_views = r.incr("article:{}:views".format(article_id))
         r.zincrby('article_ranking', 1, article_id)
-        comments = Comment.objects.filter(article=article)
         return render(request, "article/article_content.html", locals())
 
 
@@ -90,13 +90,28 @@ def comment_delete(request):
     comment_id = request.POST['id']
     comment = Comment.objects.get(id=comment_id)
     try:
-        if(request.user == comment.commentator):
+        if request.user == comment.commentator:
             comment.delete()
             return HttpResponse(json.dumps({'static':201, 'tips':'评论已删除'}))
         else:
             return HttpResponse(json.dumps({'static':502, 'tips':"You don't have permission.."}))
     except:
         return HttpResponse(json.dumps({'static':500, 'tips':'Something Error...'}))
+
+
+def init_data(data):
+    items = data.comment_reply.all()[:2]
+    list_data = []
+    for item in items:
+        if item.reply_type == 0:
+            list_data.append({'from': item.comment_user.username,'to':data.commentator.username , 'id': item.id, 'body': item.body,
+                            'created': item.created.strftime("%Y-%m-%d %H:%M:%S")})
+        else:
+            to_id = item.reply_comment
+            list_data.append(
+                {'from': item.comment_user.username, 'to': Comment_reply.objects.get(id=to_id).comment_user.username, 'id': item.id, 'body': item.body,
+                 'created': item.created.strftime("%Y-%m-%d %H:%M:%S")})
+    return list_data
 
 
 def comment_page(request, article_id):
@@ -115,5 +130,5 @@ def comment_page(request, article_id):
         comments = current_page.object_list
     comments_list=[]
     for item in comments:
-        comments_list.append({'id':item.id ,'commentator': item.commentator.username, 'created': item.created.strftime("%Y-%m-%d %H:%M:%S"), 'comment_like': item.comment_like.count(), 'body': item.body})
+        comments_list.append({'id':item.id ,'commentator': item.commentator.username,'comment_reply':init_data(item) ,'created': item.created.strftime("%Y-%m-%d %H:%M:%S"), 'comment_like': item.comment_like.count(), 'body': item.body})
     return HttpResponse(json.dumps({'code':200, 'res': comments_list, 'page_num': paginator.num_pages}))
