@@ -136,7 +136,7 @@ function init_comment(items){
                 '</a>'+
             '</div>'+
             '<div class="commentator-info">'+
-                '<a href="/account/author/'+data.from+'">'+data.from+'</a>'+
+                '<a href="/account/author/'+data.from+'" class="commentator-name">'+data.from+'</a>'+
                 '<span style="margin:0 10px">回复</span>'+
                 '<a href="/account/author/'+data.to+'">'+data.to+'</a>'+
                 '<span style="margin-left:20px">'+ data.created+'</span>'+
@@ -149,6 +149,7 @@ function init_comment(items){
              item += '<a href="javascript:void(0)" onclick="comment_reply_delete('+data.id+', this)" class="comment-tool comment-delete"><span><i class="layui-icon layui-icon-delete"></i> <span>删 除</span></span></a>'
         }else{
             item += '<a href="javascript:void(0)" onclick="comment_report()" class="comment-tool comment-report"><span><i class="layui-icon layui-icon-release"></i> <span>举 报</span></span></a>'
+            item += '<a href="javascript:void(0)" comment_id="'+data.id+'" class="comment_reply comment-tool" onclick="comment_reply(this)"><span><i class="layui-icon layui-icon-reply-fill"></i> <span class="tool-text tool-reply">回 复</span></span></a>'
         }
             item += '</div>'+
                 '<div class="reply_input" comment_id="'+data.id+'"></div>'+
@@ -174,7 +175,7 @@ layui.use(['layer', 'flow'], function(){
                 for(var i = 0; i < comments.length; i++){
                     var item = '';
                     if('{{request.user.username}}' == comments[i].commentator){
-                        var item = '<li>'+
+                        var item = '<li comment_id="'+comments[i].id+'">'+
                     '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comments[i].commentator+'">'+
@@ -182,7 +183,7 @@ layui.use(['layer', 'flow'], function(){
                             '</a>'+
                         '</div>'+
                         '<div class="commentator-info">'+
-                            '<a href="/account/author/'+comments[i].commentator+'">'+comments[i].commentator+'</a>'+
+                            '<a href="/account/author/'+comments[i].commentator+'" class="commentator-name">'+comments[i].commentator+'</a>'+
                             '<span style="margin-left:20px">'+ comments[i].created+'</span>'+
                             '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comments[i].comment_like+'</span></span>'+
                         '</div>'+
@@ -199,7 +200,7 @@ layui.use(['layer', 'flow'], function(){
                     '</div>'+init_comment(comments[i].comment_reply)+
                     '</li>'
                     }else{
-                        var item = '<li>'+
+                        var item = '<li comment_id="'+comments[i].id+'">'+
                     '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comments[i].commentator+'">'+
@@ -207,7 +208,7 @@ layui.use(['layer', 'flow'], function(){
                             '</a>'+
                         '</div>'+
                         '<div class="commentator-info">'+
-                            '<a href="/account/author/'+comments[i].commentator+'">'+comments[i].commentator+'</a>'+
+                            '<a href="/account/author/'+comments[i].commentator+'" class="commentator-name">'+comments[i].commentator+'</a>'+
                             '<span style="margin-left:20px">'+ comments[i].created+'</span>'+
                             '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comments[i].comment_like+'</span></span>'+
                         '</div>'+
@@ -238,8 +239,9 @@ var is_reply = 0; // 判断是否回复
 
 function comment_reply(e){
     if(is_reply==0){
+        var name = $(e).parent().prevAll('.commentator-info:first').find('.commentator-name').text()
         $(e).find('.tool-reply').text('取消回复');
-        $(e).parent().next().html('<textarea id="textarea" placeholder="回复"></textarea><div style="position:relative;height:40px"><div style="position:absolute;right:10px;display:block"><button class="layui-btn comment-reply-btn">send</button></div></div>')
+        $(e).parent().next().html('<textarea id="textarea" placeholder="回复 '+name+'"></textarea><div style="position:relative;height:40px"><div style="position:absolute;right:10px;display:block"><button class="layui-btn comment-reply-btn">send</button></div></div>')
         is_reply = 1;
     }else{
         $(e).find('.tool-reply').text('回 复');
@@ -261,18 +263,25 @@ $(document).ready(function(){
         <!--}-->
     <!--})-->
 
-    $('#flow_comments').on('click', '.comment-reply-btn', function(e){
+    $('body').on('click', '.comment-reply-btn', function(e){
         if($('.username').val()==''){
             layer.msg('请先登录')
         }else{
-            dom = $(this).parent().parent().parent()
-            id = dom.attr('comment_id');
-            content = dom.children("#textarea").val();
+            var dom = $(this).parent().parent().parent();
+            if(dom.parent().hasClass('commentator-root')){
+                data = {'reply_type': 0,'id': dom.attr('comment_id'), 'body': dom.children("#textarea").val()}
+            }else if(dom.parent().hasClass('commentator-child')){
+                data = {'reply_type': 1, 'comment_id': dom.parent().parent().attr('comment_id'), 'id':dom.attr('comment_id'), 'body': dom.children("#textarea").val()}
+            }else{
+                layer.msg('别搞我呀..');
+                return;
+            }
+            console.log(data)
             $.ajax({
                 url: "{% url 'comment:comment_reply' %}",
                 method: "POST",
                 dataType: "json",
-                data: {'id':id, 'body': content},
+                data: data,
                 success: function(res){
                     if(res.code=='203'){
                         console.log(res.res)
@@ -288,7 +297,7 @@ $(document).ready(function(){
                             '</a>'+
                         '</div>'+
                         '<div class="commentator-info">'+
-                            '<a href="/account/author/'+data.from+'">'+data.from+'</a>'+
+                            '<a href="/account/author/'+data.from+'" class="commentator-name">'+data.from+'</a>'+
                             '<span style="margin:0 10px">回复</span>'+
                             '<a href="/account/author/'+data.to+'">'+data.to+'</a>'+
                             '<span style="margin-left:20px">'+ data.created+'</span>'+
@@ -301,7 +310,7 @@ $(document).ready(function(){
                         '</div>'+
                         '<div class="reply_input" comment_id="'+data.id+'"></div>'+
                     '</div>'
-                        $(item).appendTo(dom.parent().parent())
+                        dom.parent().parent().find('.commentator-root').after($(item))
                         is_reply = 0;
                     }else{
                         layer.msg(res.tips);
@@ -327,7 +336,7 @@ $(document).ready(function(){
                     comment_child = res.comment_child
                     console.log(comment_child)
                     if('{{request.user.username}}' == comment_root.commentator){
-                        item = '<li>'+
+                        item = '<li comment_id="'+comment_root.id+'">'+
                     '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comment_root.commentator+'">'+
@@ -335,7 +344,7 @@ $(document).ready(function(){
                             '</a>'+
                         '</div>'+
                         '<div class="commentator-info">'+
-                            '<a href="/account/author/'+comment_root.commentator+'">'+comment_root.commentator+'</a>'+
+                            '<a href="/account/author/'+comment_root.commentator+'" class="commentator-name">'+comment_root.commentator+'</a>'+
                             '<span style="margin-left:20px">'+ comment_root.created+'</span>'+
                             '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comment_root.comment_like+'</span></span>'+
                         '</div>'+
@@ -348,7 +357,7 @@ $(document).ready(function(){
                     '</div>'+init_comment(comment_child)+
                     '</li>'
                     }else{
-                        item = '<li>'+
+                        item = '<li comment_id="'+comment_root.id+'">'+
                     '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comment_root.commentator+'">'+
@@ -356,7 +365,7 @@ $(document).ready(function(){
                             '</a>'+
                         '</div>'+
                         '<div class="commentator-info">'+
-                            '<a href="/account/author/'+comment_root.commentator+'">'+comment_root.commentator+'</a>'+
+                            '<a href="/account/author/'+comment_root.commentator+'" class="commentator-name">'+comment_root.commentator+'</a>'+
                             '<span style="margin-left:20px">'+ comment_root.created+'</span>'+
                             '<span style="margin-left:20px"> 人气值: <span class="support-comment">'+comment_root.comment_like+'</span></span>'+
                         '</div>'+
@@ -529,7 +538,7 @@ $('.comment-btn').on('click',function(){
                 if(res.code==200){
                     console.log(res);
                     commentator = res.comment_info;
-                    prepend_li='<li>'+
+                    prepend_li='<li comment_id="'+commentator.id+'">'+
                 '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                     '<div class="commentator-img">'+
                         '<a href="/account/author/'+commentator.commentator+'">'+
@@ -537,7 +546,7 @@ $('.comment-btn').on('click',function(){
                         '</a>'+
                     '</div>'+
                     '<div class="commentator-info">'+
-                        '<a href="/account/author/'+commentator.commentator+'">'+commentator.commentator+'</a>'+
+                        '<a href="/account/author/'+commentator.commentator+'" class="commentator-name">'+commentator.commentator+'</a>'+
                         '<span style="margin-left:20px">'+commentator.created+'</span>'+
                         '<span style="margin-left:20px"> 人气值: <span class="support-comment">0</span></span>'+
                     '</div>'+

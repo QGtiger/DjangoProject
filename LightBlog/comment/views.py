@@ -10,23 +10,46 @@ import json
 @csrf_exempt
 @require_POST
 def comment_reply(request):
-    id = request.POST.get('id','')
-    body = request.POST.get('body','')
-    if body.strip() == '':
-        return HttpResponse(json.dumps({'code':201,'tips':'内容不能为空'}))
+    reply_type = request.POST.get('reply_type','')
+    if reply_type == '0':
+        id = request.POST.get('id','')
+        body = request.POST.get('body','')
+        if body.strip() == '':
+            return HttpResponse(json.dumps({'code':201,'tips':'内容不能为空'}))
+        else:
+            try:
+                comment = Comment.objects.get(id=id)
+                user = request.user
+                if user == comment.commentator:
+                    return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
+                Com = Comment_reply(comment_reply=comment,comment_user=user,body=body)
+                Com.save()
+                comment_info = {'from': user.username,'to':comment.commentator.username , 'id': Com.id, 'body': Com.body,
+                                'created': Com.created.strftime("%Y-%m-%d %H:%M:%S")}
+                return HttpResponse(json.dumps({'code':203, 'tips':'评论成功', 'res':comment_info}))
+            except:
+                return HttpResponse(json.dumps({"code": 501, "tips": "评论系统出现错误"}))
     else:
-        try:
-            comment = Comment.objects.get(id=id)
-            user = request.user
-            if user == comment.commentator:
-                return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
-            Com = Comment_reply(comment_reply=comment,comment_user=user,body=body)
-            Com.save()
-            comment_info = {'from': user.username,'to':comment.commentator.username , 'id': Com.id, 'body': Com.body,
-                            'created': Com.created.strftime("%Y-%m-%d %H:%M:%S")}
-            return HttpResponse(json.dumps({'code':203, 'tips':'评论成功', 'res':comment_info}))
-        except:
-            return HttpResponse(json.dumps({"code": 501, "tips": "评论系统出现错误"}))
+        comment_id = request.POST.get('comment_id','')
+        id = request.POST.get('id', '')
+        body = request.POST.get('body', '')
+        if body.strip() == '':
+            return HttpResponse(json.dumps({'code':201,'tips':'内容不能为空'}))
+        else:
+            try:
+                comment = Comment.objects.get(id=comment_id)
+                comment_reply = Comment_reply.objects.get(id=id)
+                user = request.user
+                if user == comment.commentator:
+                    return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
+                Com = Comment_reply(comment_reply=comment,reply_type=1,comment_user=user,reply_comment=id,body=body)
+                Com.save()
+                comment_info = {'from': user.username, 'to': comment_reply.comment_user.username, 'id': Com.id, 'body': Com.body,
+                                'created': Com.created.strftime("%Y-%m-%d %H:%M:%S")}
+                return HttpResponse(json.dumps({'code': 203, 'tips': '评论成功', 'res': comment_info}))
+            except:
+                return HttpResponse(json.dumps({"code": 501, "tips": "评论系统出现错误"}))
+
 
 ## 评论删除
 @csrf_exempt
