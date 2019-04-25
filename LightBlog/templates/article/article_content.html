@@ -6,7 +6,6 @@
 
 {% with total_likes=article.users_like.count %}
 <link rel="stylesheet" href="{% static 'css/comment/comment.css' %}">
-<script type="text/javascript" src="{% static 'js/comment/comment.js' %}"></script>
 <div class="container">
     <div class="layui-row">
         <div class="layui-col-xs12 layui-col-md8">
@@ -112,6 +111,7 @@
 <script src='{% static "editor/lib/flowchart.min.js" %}'></script>
 <script src='{% static "editor/lib/jquery.flowchart.min.js" %}'></script>
 <script src='{% static "editor/editormd.js" %}'></script>
+<script type="text/javascript" src="{% static 'js/comment/comment.js' %}"></script>
 <script type="text/javascript">
 $(function(){
     editormd.markdownToHTML("editormd-view", {
@@ -125,40 +125,6 @@ $(function(){
 
 });
 
-function init_comment(items){
-    lis = ''
-    for(var i =0; i < items.length; i++){
-        data = items[i]
-        item = '<div class="commentator commentator-child" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
-            '<div class="commentator-img">'+
-                '<a href="/account/author/'+data.from+'">'+
-                    '<img src="/media/avator/'+data.from+'.jpg" class="layui-nav-img" alt="">'+
-                '</a>'+
-            '</div>'+
-            '<div class="commentator-info">'+
-                '<a href="/account/author/'+data.from+'" class="commentator-name">'+data.from+'</a>'+
-                '<span style="margin:0 10px">回复</span>'+
-                '<a href="/account/author/'+data.to+'">'+data.to+'</a>'+
-                '<span style="margin-left:20px">'+ data.created+'</span>'+
-            '</div>'+
-            '<div class="comment-wrap">'+
-                '<pre>'+data.body+'</pre>'+
-            '</div>'+
-            '<div class="meta">'
-        if('{{request.user.username}}'==data.from){
-             item += '<a href="javascript:void(0)" onclick="comment_reply_delete('+data.id+', this)" class="comment-tool comment-delete"><span><i class="layui-icon layui-icon-delete"></i> <span>删 除</span></span></a>'
-        }else{
-            item += '<a href="javascript:void(0)" onclick="comment_report()" class="comment-tool comment-report"><span><i class="layui-icon layui-icon-release"></i> <span>举 报</span></span></a>'
-            item += '<a href="javascript:void(0)" comment_id="'+data.id+'" class="comment_reply comment-tool" onclick="comment_reply(this)"><span><i class="layui-icon layui-icon-reply-fill"></i> <span class="tool-text tool-reply">回 复</span></span></a>'
-        }
-            item += '</div>'+
-                '<div class="reply_input" comment_id="'+data.id+'"></div>'+
-            '</div>'
-
-        lis += item
-    }
-    return lis
-}
 
 layui.use(['layer', 'flow'], function(){
     var flow = layui.flow;
@@ -176,7 +142,7 @@ layui.use(['layer', 'flow'], function(){
                     var item = '';
                     if('{{request.user.username}}' == comments[i].commentator){
                         var item = '<li comment_id="'+comments[i].id+'">'+
-                    '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator commentator-root" id="comment-root-'+comments[i].id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comments[i].commentator+'">'+
                                 '<img src="/media/avator/'+comments[i].commentator+'.jpg" class="layui-nav-img" alt="">'+
@@ -201,7 +167,7 @@ layui.use(['layer', 'flow'], function(){
                     '</li>'
                     }else{
                         var item = '<li comment_id="'+comments[i].id+'">'+
-                    '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator commentator-root" id="comment-root-'+comments[i].id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comments[i].commentator+'">'+
                                 '<img src="/media/avator/'+comments[i].commentator+'.jpg" class="layui-nav-img" alt="">'+
@@ -290,7 +256,7 @@ $(document).ready(function(){
                         //console.log(dom)
                         dom.prev().find(".tool-reply").text('回 复')
                         data = res.res
-                        item = '<div class="commentator commentator-child" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                        item = '<div class="commentator commentator-child" id="comment-child-'+data.id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+data.from+'">'+
                                 '<img src="/media/avator/'+data.from+'.jpg" class="layui-nav-img" alt="">'+
@@ -337,7 +303,7 @@ $(document).ready(function(){
                     console.log(comment_child)
                     if('{{request.user.username}}' == comment_root.commentator){
                         item = '<li comment_id="'+comment_root.id+'">'+
-                    '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator commentator-root" id="comment-root-'+comment_root.id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comment_root.commentator+'">'+
                                 '<img src="/media/avator/'+comment_root.commentator+'.jpg" class="layui-nav-img" alt="">'+
@@ -358,7 +324,7 @@ $(document).ready(function(){
                     '</li>'
                     }else{
                         item = '<li comment_id="'+comment_root.id+'">'+
-                    '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                    '<div class="commentator commentator-root" id="comment-root-'+comment_root.id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                         '<div class="commentator-img">'+
                             '<a href="/account/author/'+comment_root.commentator+'">'+
                                 '<img src="/media/avator/'+comment_root.commentator+'.jpg" class="layui-nav-img" alt="">'+
@@ -539,7 +505,7 @@ $('.comment-btn').on('click',function(){
                     console.log(res);
                     commentator = res.comment_info;
                     prepend_li='<li comment_id="'+commentator.id+'">'+
-                '<div class="commentator commentator-root" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
+                '<div class="commentator commentator-root" id="comment-root-'+commentator.id+'" onmouseenter="EnterFunction(this)" onmouseleave="LeaveFunction(this)">'+
                     '<div class="commentator-img">'+
                         '<a href="/account/author/'+commentator.commentator+'">'+
                             '<img src="/media/avator/'+commentator.commentator+'.jpg" class="layui-nav-img" alt="">'+
@@ -562,6 +528,7 @@ $('.comment-btn').on('click',function(){
             '</li>'
 
                     $('.history-comment ul').prepend(prepend_li);
+                    layer.msg(res.tips);
                 }else{
                     layer.msg(res.tips);
                 }

@@ -1,10 +1,12 @@
 from django.shortcuts import render,HttpResponse
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST,require_http_methods,require_GET
 from article.models import Comment
 from .models import Comment_reply
 import json
+import math
 
 # Create your views here.
 @csrf_exempt
@@ -40,7 +42,7 @@ def comment_reply(request):
                 comment = Comment.objects.get(id=comment_id)
                 comment_reply = Comment_reply.objects.get(id=id)
                 user = request.user
-                if user == comment.commentator:
+                if user == comment_reply.comment_user:
                     return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
                 Com = Comment_reply(comment_reply=comment,reply_type=1,comment_user=user,reply_comment=id,body=body)
                 Com.save()
@@ -92,3 +94,50 @@ def comment_reply_get(request):
     length = len(comment_child)
     return HttpResponse(json.dumps({'code':201,'comment_root': comment_root, 'comment_child': comment_child, 'nums':length}))
 
+
+@login_required(login_url='/account/login/')
+def message(request):
+    return render(request, 'comment/notifications.html')
+
+
+@require_GET
+def notifications(request):
+    page = request.GET.get('page', 1)
+    try:
+        page = int(page)
+    except:
+        page = 1
+    user = request.user
+    articles = user.article_post.all()
+    response = []
+    for article in articles:
+        comments = article.comments.all()
+        for comment in comments:
+            comment.is_read = 1
+            comment.save()
+            if user == comment.commentator:
+                continue
+            response.append({'commentator':comment.commentator.username, 'article_title': article.title, 'time': comment.created.strftime("%Y-%m-%d %H:%M:%S"), 'body': comment.body[:50], 'comment_root_id': comment.id, 'article_id': article.id})
+    response.sort(key=lambda x: x['time'], reverse=True)
+    nums = math.ceil(len(response)/6.0)
+    if page > nums:
+        page = nums
+    res = response[6*(page-1):6*page]
+    return HttpResponse(json.dumps({'code':201, 'res':res, 'nums':nums}))
+
+
+@require_GET
+def is_read_comments(request):
+    user = request.user
+    articles = user.article_post.all()
+    count = 0
+    for article in articles:
+        comments = article.comments.all()
+        for comment in comments:
+            if user == comment.commentator:
+                comment.is_read = 1
+                comment.save()
+                continue
+            elif comment.is_read == 0:
+                count += 1
+    return HttpResponse(json.dumps({'code':201, 'nums':count}))

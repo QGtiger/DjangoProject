@@ -42,6 +42,7 @@ class Comment(models.Model):
     body = models.TextField()
     created = models.DateTimeField(default=timezone.now)
     comment_like = models.ManyToManyField(User, related_name="comment_like", blank=True)
+    is_read = models.IntegerField(default=0)
 
     class Meta:
         ordering = ('-created',)
