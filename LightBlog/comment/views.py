@@ -24,7 +24,7 @@ def comment_reply(request):
                 user = request.user
                 if user == comment.commentator:
                     return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
-                Com = Comment_reply(comment_reply=comment,comment_user=user,body=body)
+                Com = Comment_reply(comment_reply=comment, comment_user=user, commented_user=comment.commentator, body=body)
                 Com.save()
                 comment_info = {'from': user.username,'to':comment.commentator.username , 'id': Com.id, 'body': Com.body,
                                 'created': Com.created.strftime("%Y-%m-%d %H:%M:%S")}
@@ -44,7 +44,7 @@ def comment_reply(request):
                 user = request.user
                 if user == comment_reply.comment_user:
                     return HttpResponse(json.dumps({'code':202,'tips':'别搞我'}))
-                Com = Comment_reply(comment_reply=comment,reply_type=1,comment_user=user,reply_comment=id,body=body)
+                Com = Comment_reply(comment_reply=comment, reply_type=1, comment_user=user, reply_comment=id, commented_user=comment_reply.comment_user, body=body)
                 Com.save()
                 comment_info = {'from': user.username, 'to': comment_reply.comment_user.username, 'id': Com.id, 'body': Com.body,
                                 'created': Com.created.strftime("%Y-%m-%d %H:%M:%S")}
@@ -140,4 +140,24 @@ def is_read_comments(request):
                 continue
             elif comment.is_read == 0:
                 count += 1
-    return HttpResponse(json.dumps({'code':201, 'nums':count}))
+    commented_comments = user.commented_user.all()
+    commented_count = 0
+    for comment in commented_comments:
+        if comment.is_read == 0:
+            commented_count += 1
+    return HttpResponse(json.dumps({'code':201, 'nums':count, 'commented_nums': commented_count}))
+
+
+@login_required(login_url='/account/login/')
+@require_GET
+def comments(request):
+    user = request.user
+    commenteds = user.commented_user.all()
+    res = []
+    for comment in commenteds:
+        comment.is_read = 1
+        comment.save()
+        res.append({'commentator': comment.comment_user.username, 'article_title': comment.comment_reply.article.title, 'time': comment.created.strftime("%Y-%m-%d %H:%M:%S"), 'body': comment.body[:50],'comment_root_id': comment.comment_reply.id, 'comment_child_id': comment.id, 'article_id': comment.comment_reply.article.id})
+    res.sort(key=lambda x: x['time'], reverse=True)
+    return render(request, 'comment/comments.html', {'comments': res})
+

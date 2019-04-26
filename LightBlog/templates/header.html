@@ -11,7 +11,7 @@
     <dl class="layui-nav-child">
         {% if request.session.username %}
       <dd><a href="{% url 'account:my_information' %}">个人信息</a></dd>
-      <dd><a href="{% url 'comment:message' %}">我的消息<span class="layui-badge read-comments"></span></a></dd>
+      <dd><a href="{% url 'comment:message' %}">我的消息<span class="layui-badge read-comments-all" style="display:none"></span></a></dd>
       <dd><a href="{% url 'account:edit_myself' %}">完善信息</a></dd>
       <dd><a href="{% url 'account:account_setpassword' %}">修改密码</a></dd>
       <dd><a href="{% url 'article:article_column' %}">后台管理</a></dd>
@@ -42,10 +42,15 @@
 	        $('.avator').attr('src','/media/avator/'+username+'.jpg?'+Math.random())
             $.get('/comment/is_read_comments', function(e){
                 res = JSON.parse(e)
-                if(res.nums != '0'){
-                    $('.read-comments').text(res.nums)
-                }else{
-                    $('.read-comments').remove()
+                nums = res.nums
+                commented_nums = res.commented_nums
+                if(nums+commented_nums != 0){
+                    $('.read-comments-all').css('display','inline-block')
+                    $('.read-comments-all').text(nums+commented_nums)
+                    $('.read-comments').css('display','block')
+                    $('.read-comments').text(nums)
+                    $('.read-commented').css('display','block')
+                    $('.read-commented').text(commented_nums)
                 }
             })
 	    }else{
