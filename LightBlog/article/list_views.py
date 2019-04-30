@@ -12,6 +12,7 @@ import redis
 
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 
+
 def article_titles(request):
     length = r.zcard('article_ranking')
     article_ranking = r.zrange("article_ranking", 0, length, desc=True)[:5]
@@ -19,7 +20,6 @@ def article_titles(request):
     most_viewed = list(ArticlePost.objects.filter(id__in=article_ranking_ids))
     most_viewed.sort(key=lambda x: article_ranking_ids.index(x.id))
     return render(request,'article/article_titles.html',locals())
-
 
 
 def article_page(request):
@@ -40,6 +40,7 @@ def article_page(request):
         articles_json.append({'id':articles[i].id,'author':articles[i].author.username,'title':articles[i].title,'updated':articles[i].updated.strftime("%Y-%m-%d %H:%M:%S"),'body':articles[i].body[:70],'users_like':articles[i].users_like.count()})
     #return HttpResponse(serializers.serialize("json",articles))
     return HttpResponse(json.dumps({'static':200,'data':articles_json,'page_num':paginator.num_pages}))
+
 
 @csrf_exempt
 def article_content(request, article_id):
