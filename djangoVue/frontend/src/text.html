@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<button click="emm">emm</button>
+	<script type="text/javascript" src="./jquery.js"></script>
+	<script type="text/javascript">
+		function emm(){
+	      $.ajax({
+	        url: "http://127.0.0.1:8000/backend/login",
+	        type: "POST",
+	        data: data,
+	        dataType: 'json',
+	        success: function(e){
+	          console.log(e);
+	        }
+	      })
+		}
+	      $.ajax({
+	        url: "http://127.0.0.1:8000/backend/login",
+	        type: "POST",
+	        data: {'u':1,'p':2},
+	        dataType: 'json',
+	        success: function(e){
+	          console.log(e);
+	        }
+	      })
+	</script>
+</body>
+</html>
