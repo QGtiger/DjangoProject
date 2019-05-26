@@ -12,12 +12,14 @@
     <br>
     <br>
     <Button type="primary" @click="handleLogin" key="login">登录</Button>
+    <Button type="primary" @click="handleIsLogin" key="islogin">测试是否登录</Button>
   </div>
 </template>
 
 <script>
 import $ from "@/jquery";
 import axios from "axios";
+axios.defaults.withCredentials = true;
 export default {
   name: "HelloWorld",
   data() {
@@ -64,10 +66,23 @@ export default {
       }).then(res => {
         console.log(res.data);
         _this.msg = res.data;
-        const { sesssionid } = res.data;
-        localStorage.setItem("sesssionid", sesssionid);
-        document.cookie = `sesssionid=${sesssionid};`
+        const { token } = res.data;
+        //localStorage.setItem("sesssionid", sesssionid);
+        document.cookie = `token=${token}&${username};`
       });
+    },
+    handleIsLogin () {
+      axios({
+        method: "get",
+        url: "http://127.0.0.1:8000/backend/islogin"
+      }).then(res=>{
+        console.log(res.data);
+        var response = res.data;
+        this.$Modal.info({
+          title: '是否登陆',
+          content: response.tips
+        })
+      })
     }
   }
 };

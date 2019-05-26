@@ -8,6 +8,7 @@ from .models import Comment_reply
 import json
 import math
 
+
 # Create your views here.
 @csrf_exempt
 @require_POST

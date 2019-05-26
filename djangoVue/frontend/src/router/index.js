@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/account/Login'
 import Register from '@/components/account/register'
+import Collapse from '@/components/collapse'
 
 Vue.use(Router)
 
@@ -13,6 +14,7 @@ export default new Router({
       meta: {
         title: '首页'
       },
+      component: Collapse
     },
     {
       path: '/login',
