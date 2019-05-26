@@ -17,9 +17,8 @@
 </template>
 
 <script>
-import $ from "@/jquery";
-import axios from "axios";
-axios.defaults.withCredentials = true;
+import { doLogin } from '@/api/login'
+import request from '@/libs/request'
 export default {
   name: "HelloWorld",
   data() {
@@ -41,40 +40,48 @@ export default {
         });
         return;
       }
-      var data = {
-        username: _this.username,
-        password: _this.password
-      };
-      console.log(data);
-      // jQuery.ajax({
+      doLogin(username,password).then(res=>{
+        console.log(res)
+        if(res.data.status === 200){
+          const {token} = res.data;
+          this.$Modal.info({
+            title: "success",
+            content: "登陆成功"
+          });
+          localStorage.setItem('token', `${token}&${username}`)
+        }else{
+          this.$Modal.error({
+            title: "failure",
+            content: "登陆失败"
+          });
+        }
+      })
+      // var data = {
+      //   username: _this.username,
+      //   password: _this.password
+      // };
+      // console.log(data);
+      // const _data = new FormData();
+      // _data.append("username", _this.username);
+      // _data.append("password", _this.password);
+      // axios({
+      //   method: "post",
       //   url: "http://127.0.0.1:8000/backend/login",
-      //   type: "POST",
-      //   data: data,
-      //   dataType: 'json',
-      //   success: function(e){
-      //     _this.msg = e;
-      //   }
-      // })ma
-      const _data = new FormData();
-      _data.append("username", _this.username);
-      _data.append("password", _this.password);
-      axios({
-        method: "post",
-        url: "http://127.0.0.1:8000/backend/login",
-        data: _data,
-        // withCredentials: true
-      }).then(res => {
-        console.log(res.data);
-        _this.msg = res.data;
-        const { token } = res.data;
-        //localStorage.setItem("sesssionid", sesssionid);
-        document.cookie = `token=${token}&${username};`
-      });
+      //   data: _data,
+      //   // withCredentials: true
+      // }).then(res => {
+      //   console.log(res.data);
+      //   _this.msg = res.data;
+      //   const { token } = res.data;
+      //   //localStorage.setItem("sesssionid", sesssionid);
+      //   document.cookie = `token=${token}&${username};`
+      // });
     },
     handleIsLogin () {
-      axios({
+      request({
         method: "get",
-        url: "http://127.0.0.1:8000/backend/islogin"
+        url: "/backend/islogin",
+        withCredentials: true
       }).then(res=>{
         console.log(res.data);
         var response = res.data;
@@ -87,7 +94,3 @@ export default {
   }
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>
